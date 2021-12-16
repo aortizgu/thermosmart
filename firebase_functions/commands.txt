@@ -1,0 +1,1 @@
+firebase emulators:start --import=./persistency --export-on-exit

@@ -1,0 +1,41 @@
+{
+    "root": {
+        "devices": {
+            "devicetestuuid1": {
+                "configuration": {
+                    "enabled": true,
+                    "followers": [
+                        "usertestuuid1"
+                    ],
+                    "threshold": 20.1
+                },
+                "status": {
+                    "active": false,
+                    "records": {
+                        "1639648785": {
+                            "active": false,
+                            "temperature": 0.0
+                        }
+                    },
+                    "temperature": 0.0
+                }
+            }
+        },
+        "users": {
+            "usertestuuid1": {
+                "devices": [
+                    "devicetestuuid1"
+                ],
+                "tokens": [
+                    "usertestuuid1token0"
+                ]
+            },
+            "usertestuuid2": {
+                "tokens": [
+                    "usertestuuid2token0",
+                    "usertestuuid2token1"
+                ]
+            }
+        }
+    }
+}
