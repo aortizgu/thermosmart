@@ -23,6 +23,10 @@
     <string name="thermostat_state">"State: "</string>
     <string name="thermostat_threshold">"Threshold: "</string>
     <string name="config_threshold">"Threshold: "</string>
+    <string name="dropped_pin">Thermostat Location</string>
     <bool name="show_in_fahrenheit">false</bool>
-
+    <string name="normal_map">Normal Map</string>
+    <string name="hybrid_map">Hybrid Map</string>
+    <string name="satellite_map">Satellite Map</string>
+    <string name="terrain_map">Terrain Map</string>
 </resources>

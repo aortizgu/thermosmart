@@ -38,7 +38,7 @@
                 app:layout_constraintTop_toTopOf="parent"
                 tools:text="Title" />
 
-            <TextView
+<!--            <TextView
                 android:id="@+id/temperature"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -59,7 +59,7 @@
                 app:layout_constraintBottom_toBottomOf="@+id/temperature"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/name"
-                tools:text="Location" />
+                tools:text="Location" />-->
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>

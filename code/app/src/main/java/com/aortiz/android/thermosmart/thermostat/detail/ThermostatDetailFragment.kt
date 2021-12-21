@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.aortiz.android.thermosmart.R
 import com.aortiz.android.thermosmart.databinding.ThermostatDetailFragmentBinding
+import com.aortiz.android.thermosmart.utils.setDisplayHomeAsUpEnabled
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
 
@@ -22,6 +23,7 @@ class ThermostatDetailFragment : Fragment() {
     ): View? {
         Timber.i("onCreateView")
         setHasOptionsMenu(true)
+        setDisplayHomeAsUpEnabled(true)
         thermostatId = ThermostatDetailFragmentArgs.fromBundle(requireArguments()).thermostatId
         binding =
             DataBindingUtil.inflate(

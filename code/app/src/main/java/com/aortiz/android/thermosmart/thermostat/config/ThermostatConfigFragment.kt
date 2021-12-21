@@ -9,6 +9,7 @@ import androidx.navigation.fragment.findNavController
 import com.aortiz.android.thermosmart.R
 import com.aortiz.android.thermosmart.databinding.ThermostatConfigFragmentBinding
 import com.aortiz.android.thermosmart.thermostat.detail.ThermostatDetailFragmentArgs
+import com.aortiz.android.thermosmart.utils.setDisplayHomeAsUpEnabled
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
 
@@ -24,6 +25,7 @@ class ThermostatConfigFragment : Fragment() {
     ): View? {
         Timber.i("onCreateView")
         setHasOptionsMenu(true)
+        setDisplayHomeAsUpEnabled(true)
         thermostatId = ThermostatDetailFragmentArgs.fromBundle(requireArguments()).thermostatId
         binding =
             DataBindingUtil.inflate(
@@ -52,6 +54,9 @@ class ThermostatConfigFragment : Fragment() {
             override fun onStartTrackingTouch(seekBar: SeekBar?) {}
             override fun onStopTrackingTouch(seekBar: SeekBar?) {}
         })
+        binding.selectLocation.setOnClickListener {
+            findNavController().navigate(ThermostatConfigFragmentDirections.actionThermostatConfigFragmentToSelectLocationFragment())
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -68,8 +73,4 @@ class ThermostatConfigFragment : Fragment() {
         super.onCreateOptionsMenu(menu, inflater)
         inflater.inflate(R.menu.menu_config, menu)
     }
-}
-
-private fun SeekBar.setOnSeekBarChangeListener() {
-    TODO("Not yet implemented")
 }

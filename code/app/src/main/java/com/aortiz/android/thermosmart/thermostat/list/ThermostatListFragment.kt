@@ -9,6 +9,7 @@ import androidx.navigation.fragment.findNavController
 import com.aortiz.android.thermosmart.R
 import com.aortiz.android.thermosmart.authentication.AuthenticationActivity
 import com.aortiz.android.thermosmart.databinding.ThermostatListFragmentBinding
+import com.aortiz.android.thermosmart.utils.setDisplayHomeAsUpEnabled
 import com.firebase.ui.auth.AuthUI
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
@@ -24,6 +25,7 @@ class ThermostatListFragment : Fragment() {
     ): View? {
         Timber.i("onCreateView")
         setHasOptionsMenu(true)
+        setDisplayHomeAsUpEnabled(false)
         binding =
             DataBindingUtil.inflate(
                 inflater,

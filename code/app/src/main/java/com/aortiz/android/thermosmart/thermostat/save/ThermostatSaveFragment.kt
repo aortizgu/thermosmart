@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.aortiz.android.thermosmart.R
 import com.aortiz.android.thermosmart.databinding.ThermostatSaveFragmentBinding
+import com.aortiz.android.thermosmart.utils.setDisplayHomeAsUpEnabled
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
 
@@ -23,6 +24,7 @@ class ThermostatSaveFragment : Fragment() {
     ): View? {
         Timber.i("onCreateView")
         setHasOptionsMenu(true)
+        setDisplayHomeAsUpEnabled(true)
         binding =
             DataBindingUtil.inflate(
                 inflater,
@@ -36,6 +38,7 @@ class ThermostatSaveFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         Timber.i("onViewCreated")
         binding.lifecycleOwner = this
+
         binding.saveThermostat.setOnClickListener {
             viewModel.save()
             findNavController().popBackStack()

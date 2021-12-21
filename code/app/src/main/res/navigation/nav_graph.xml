@@ -30,6 +30,9 @@
             app:popUpTo="@id/thermostatListFragment" />
         <argument android:name="thermostatId"
             app:argType="string" />
+        <action
+            android:id="@+id/action_thermostatConfigFragment_to_selectLocationFragment"
+            app:destination="@id/selectLocationFragment" />
     </fragment>
     <fragment
         android:id="@+id/thermostatSaveFragment"
@@ -53,4 +56,8 @@
         android:name="com.aortiz.android.thermosmart.config.AppConfigFragment"
         android:label="app_config_fragment"
         tools:layout="@layout/app_config_fragment" />
+    <fragment
+        android:id="@+id/selectLocationFragment"
+        android:name="com.aortiz.android.thermosmart.thermostat.config.selectlocation.SelectLocationFragment"
+        android:label="SelectLocationFragment" />
 </navigation>
