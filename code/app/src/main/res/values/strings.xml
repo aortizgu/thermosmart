@@ -1,13 +1,28 @@
 <resources>
     <string name="app_name">thermosmart</string>
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="nav_header_title">Android Studio</string>
-    <string name="nav_header_subtitle">android.studio@android.com</string>
-    <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
+    <!-- Strings used for fragments for navigation -->
+    <string name="first_fragment_label">First Fragment</string>
+    <string name="second_fragment_label">Second Fragment</string>
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
 
-    <string name="menu_home">Home</string>
-    <string name="menu_gallery">Gallery</string>
-    <string name="menu_slideshow">Slideshow</string>
+    <string name="hello_first_fragment">Hello first fragment</string>
+    <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
+    <string name="login">Login</string>
+    <string name="action_logout">Logout</string>
+    <string name="save">Save</string>
+    <string name="thermostat_id">"Thermostat Id "</string>
+    <string name="thermostat_name">Thermostat Name</string>
+    <string name="thermostat_location">Thermostat Location</string>
+    <string name="show_in_fahrenheit_key">show_in_fahrenheit_key</string>
+    <string name="shared_preferences">shared_preferences</string>
+    <string name="units">Set Temperature Unit</string>
+    <string name="action_remove">Remove</string>
+    <string name="exterior">Exterior</string>
+    <string name="thermostat_state">"State: "</string>
+    <string name="thermostat_threshold">"Threshold: "</string>
+    <string name="config_threshold">"Threshold: "</string>
+    <bool name="show_in_fahrenheit">false</bool>
+
 </resources>

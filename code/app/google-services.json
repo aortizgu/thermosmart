@@ -1,0 +1,85 @@
+{
+  "project_info": {
+    "project_number": "281973004518",
+    "firebase_url": "https://thermosmart-b5382-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "thermosmart-b5382",
+    "storage_bucket": "thermosmart-b5382.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:281973004518:android:c5f529c3c3e386c6db8327",
+        "android_client_info": {
+          "package_name": "com.aortiz.android.test_firebase"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "281973004518-h2852fb32cmhf8cfoneu4lnaa19lo5sg.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.aortiz.android.test_firebase",
+            "certificate_hash": "62e21b9ec9e5bea80f89cbd573141ddc4963d161"
+          }
+        },
+        {
+          "client_id": "281973004518-lc05gmgvd8pq2ab36kcptdj56p7ajf8s.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBFfhVsy48XKF6BRrtxcy2gP8LkHyApLWM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "281973004518-lc05gmgvd8pq2ab36kcptdj56p7ajf8s.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:281973004518:android:086d003584f41c95db8327",
+        "android_client_info": {
+          "package_name": "com.aortiz.android.thermosmart"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "281973004518-rlui2vlmnkgdovpqjqodhckh2jvshdc5.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.aortiz.android.thermosmart",
+            "certificate_hash": "62e21b9ec9e5bea80f89cbd573141ddc4963d161"
+          }
+        },
+        {
+          "client_id": "281973004518-lc05gmgvd8pq2ab36kcptdj56p7ajf8s.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBFfhVsy48XKF6BRrtxcy2gP8LkHyApLWM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "281973004518-lc05gmgvd8pq2ab36kcptdj56p7ajf8s.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

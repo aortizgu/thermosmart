@@ -5,9 +5,10 @@
                 "configuration": {
                     "enabled": true,
                     "followers": [
-                        "usertestuuid1"
+                        "usertestuuid1",
+                        "usertestuuid2"
                     ],
-                    "threshold": 20.1
+                    "threshold": 20.5
                 },
                 "status": {
                     "active": false,
@@ -17,7 +18,7 @@
                             "temperature": 0.0
                         }
                     },
-                    "temperature": 0.0
+                    "temperature": 20.0
                 }
             }
         },
