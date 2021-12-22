@@ -4,6 +4,7 @@ import android.app.Application
 import com.aortiz.android.thermosmart.authentication.AuthenticationViewModel
 import com.aortiz.android.thermosmart.config.AppConfigViewModel
 import com.aortiz.android.thermosmart.database.local.SharedPreferencesDatabase
+import com.aortiz.android.thermosmart.database.realtime.RTDatabase
 import com.aortiz.android.thermosmart.repository.ThermostatRepository
 import com.aortiz.android.thermosmart.thermostat.config.ThermostatConfigViewModel
 import com.aortiz.android.thermosmart.thermostat.detail.ThermostatDetailViewModel
@@ -40,22 +41,27 @@ class MyApp : Application() {
             }
             viewModel {
                 ThermostatSaveViewModel(
+                    get(),
                     get()
                 )
             }
-            viewModel {
+            viewModel { parameters ->
                 ThermostatDetailViewModel(
-                    get()
+                    get(),
+                    get(),
+                    parameters.get<String>() as String
                 )
             }
-            viewModel {
+            single {
                 ThermostatConfigViewModel(
+                    get(),
                     get()
                 )
             }
 
             single { SharedPreferencesDatabase(get()) }
-            single { ThermostatRepository() }
+            single { ThermostatRepository(get()) }
+            single { RTDatabase(get()) }
         }
 
         startKoin {

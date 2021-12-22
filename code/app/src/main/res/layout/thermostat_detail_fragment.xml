@@ -109,6 +109,26 @@
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <TextView
+                    android:id="@+id/thermostatNameTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/margin_normal"
+                    android:layout_marginLeft="@dimen/margin_normal"
+                    android:layout_marginTop="@dimen/margin_normal"
+                    android:text="@string/thermostat_name"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/thermostatStateTextView" />
+
+                <TextView
+                    android:id="@+id/thermostatNameValueTextView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@{viewModel.thermostat.name}"
+                    app:layout_constraintBaseline_toBaselineOf="@+id/thermostatNameTextView"
+                    app:layout_constraintStart_toEndOf="@+id/thermostatNameTextView"
+                    tools:text="My thermostat" />
+
+                <TextView
                     android:id="@+id/thermostatThresholdTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -117,12 +137,13 @@
                     android:layout_marginTop="@dimen/margin_normal"
                     android:text="@string/thermostat_threshold"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/thermostatStateTextView" />
+                    app:layout_constraintTop_toBottomOf="@+id/thermostatNameTextView" />
 
                 <TextView
                     android:id="@+id/thermostatThresholdValueTextView"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:text="@{viewModel.thermostat.threshold.toString()}"
                     app:layout_constraintBaseline_toBaselineOf="@+id/thermostatThresholdTextView"
                     app:layout_constraintStart_toEndOf="@+id/thermostatThresholdTextView"
                     tools:text="22.5 ºC" />

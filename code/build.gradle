@@ -29,7 +29,7 @@ task clean(type: Delete) {
 ext {
     // Sdk and tools
     // Support library and architecture components support minSdk 14 and above.
-    minSdkVersion = 16
+    minSdkVersion = 19
     targetSdkVersion = 29
     compileSdkVersion = 29
 
@@ -61,6 +61,7 @@ ext {
     androidXTestRulesVersion = '1.4.0'
     espressoVersion = '3.4.0'
     firebaseUIVersion = '5.0.0'
+    firebaseRTDBVersion = '20.0.3'
     multidexVersion = '2.0.1'
     timberVersion = '4.7.1'
 }

@@ -28,11 +28,12 @@
             android:id="@+id/action_thermostatConfigFragment_to_thermostatListFragment"
             app:destination="@id/thermostatListFragment"
             app:popUpTo="@id/thermostatListFragment" />
-        <argument android:name="thermostatId"
-            app:argType="string" />
         <action
             android:id="@+id/action_thermostatConfigFragment_to_selectLocationFragment"
             app:destination="@id/selectLocationFragment" />
+        <argument
+            android:name="thermostat"
+            app:argType="com.aortiz.android.thermosmart.domain.Thermostat" />
     </fragment>
     <fragment
         android:id="@+id/thermostatSaveFragment"

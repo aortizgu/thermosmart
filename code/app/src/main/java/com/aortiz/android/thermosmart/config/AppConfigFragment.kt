@@ -35,7 +35,7 @@ class AppConfigFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         Timber.i("onViewCreated")
-        binding.lifecycleOwner = this
+        binding.lifecycleOwner = viewLifecycleOwner
         binding.saveAppSettingsButton.setOnClickListener {
             viewModel.showInFahrenheit = binding.toggleButton.isChecked
             findNavController().popBackStack()

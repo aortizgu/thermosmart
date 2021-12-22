@@ -121,8 +121,13 @@ dependencies {
 
     // Firebase UI
     implementation "com.firebaseui:firebase-ui-auth:$firebaseUIVersion"
+    implementation "com.google.firebase:firebase-database-ktx:$firebaseRTDBVersion"
+    implementation 'com.google.firebase:firebase-auth-ktx:21.0.1'
+
+    // Firebase FCM
+    implementation 'com.google.firebase:firebase-messaging-ktx:23.0.0'
+    implementation 'com.google.firebase:firebase-analytics-ktx:20.0.0'
 
     implementation "androidx.multidex:multidex:$multidexVersion"
     implementation "com.jakewharton.timber:timber:$timberVersion"
-
 }

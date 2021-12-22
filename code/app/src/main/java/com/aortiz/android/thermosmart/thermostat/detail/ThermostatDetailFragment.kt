@@ -9,11 +9,12 @@ import com.aortiz.android.thermosmart.R
 import com.aortiz.android.thermosmart.databinding.ThermostatDetailFragmentBinding
 import com.aortiz.android.thermosmart.utils.setDisplayHomeAsUpEnabled
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import org.koin.core.parameter.parametersOf
 import timber.log.Timber
 
 class ThermostatDetailFragment : Fragment() {
 
-    private val viewModel: ThermostatDetailViewModel by viewModel()
+    private val viewModel: ThermostatDetailViewModel by viewModel { parametersOf(thermostatId) }
     private lateinit var binding: ThermostatDetailFragmentBinding
     private lateinit var thermostatId: String
 
@@ -43,11 +44,13 @@ class ThermostatDetailFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.action_config -> {
-                findNavController().navigate(
-                    ThermostatDetailFragmentDirections.actionThermostatDetailFragmentToThermostatConfigFragment(
-                        thermostatId
+                viewModel.thermostat.value?.let {
+                    findNavController().navigate(
+                        ThermostatDetailFragmentDirections.actionThermostatDetailFragmentToThermostatConfigFragment(
+                            it
+                        )
                     )
-                )
+                }
             }
         }
         return super.onOptionsItemSelected(item)

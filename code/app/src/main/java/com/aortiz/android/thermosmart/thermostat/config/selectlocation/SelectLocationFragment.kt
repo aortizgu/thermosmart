@@ -7,12 +7,14 @@ import android.content.pm.PackageManager
 import android.location.Location
 import android.os.Bundle
 import android.view.*
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.aortiz.android.thermosmart.R
 import com.aortiz.android.thermosmart.databinding.SelectLocationFragmentBinding
+import com.aortiz.android.thermosmart.thermostat.config.ThermostatConfigViewModel
 import com.aortiz.android.thermosmart.utils.setDisplayHomeAsUpEnabled
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -20,7 +22,10 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.*
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.Marker
+import com.google.android.gms.maps.model.MarkerOptions
+import org.koin.android.ext.android.inject
 import timber.log.Timber
 import java.util.*
 
@@ -28,13 +33,13 @@ import java.util.*
 class SelectLocationFragment : OnMapReadyCallback, Fragment() {
 
     private lateinit var binding: SelectLocationFragmentBinding
+    private val viewModel: ThermostatConfigViewModel by inject()
     private lateinit var map: GoogleMap
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     private val REQUEST_LOCATION_PERMISSION = 1
     private var marker: Marker? = null
     private var lastKnownLocation: Location? = null
     private val defaultLocation = LatLng(-33.8523341, 151.2106085)
-    private var selectedPOI: PointOfInterest? = null
     private var selectedLatLng: LatLng? = null
     private var selectedLocation: String? = null
 
@@ -44,8 +49,8 @@ class SelectLocationFragment : OnMapReadyCallback, Fragment() {
         binding =
             DataBindingUtil.inflate(inflater, R.layout.select_location_fragment, container, false)
 
-//        binding.viewModel = _viewModel
-        binding.lifecycleOwner = this
+        binding.viewModel = viewModel
+        binding.lifecycleOwner = viewLifecycleOwner
         binding.selectLocationButtonSave.setOnClickListener {
             onLocationSelected()
         }
@@ -64,11 +69,9 @@ class SelectLocationFragment : OnMapReadyCallback, Fragment() {
     }
 
     private fun onLocationSelected() {
-//        _viewModel.latitude.value = selectedLatLng?.latitude
-//        _viewModel.longitude.value = selectedLatLng?.longitude
-//        _viewModel.reminderSelectedLocationStr.value = selectedLocation
-//        _viewModel.selectedPOI.value = selectedPOI
-//        _viewModel.navigationCommand.value = NavigationCommand.Back
+        viewModel.latitude.value = selectedLatLng?.latitude
+        viewModel.longitude.value = selectedLatLng?.longitude
+        viewModel.location.value = selectedLocation
         findNavController().popBackStack()
     }
 
@@ -99,7 +102,6 @@ class SelectLocationFragment : OnMapReadyCallback, Fragment() {
     override fun onMapReady(googleMap: GoogleMap?) {
         Timber.d("onMapReady")
         map = googleMap!!
-        //setPoiClick()
         setMapOnClick()
         enableMyLocation()
     }
@@ -118,7 +120,23 @@ class SelectLocationFragment : OnMapReadyCallback, Fragment() {
         if (isPermissionGranted()) {
             Timber.d("enableMyLocation: permission granted")
             map.isMyLocationEnabled = true
-            getDeviceLocation()
+            if (!viewModel.location.value.isNullOrEmpty() && !viewModel.location.value.contentEquals(
+                    "null"
+                )
+            ) {
+                val latLng = LatLng(
+                    viewModel.latitude.value ?: defaultLocation.latitude,
+                    viewModel.longitude.value ?: defaultLocation.longitude,
+                )
+                map?.moveCamera(
+                    CameraUpdateFactory.newLatLngZoom(
+                        latLng, 15f
+                    )
+                )
+                setMarker(latLng, viewModel.location.value)
+            } else {
+                getDeviceLocation()
+            }
         } else {
             Timber.d("enableMyLocation: permission not granted")
             requestPermissions(
@@ -140,8 +158,11 @@ class SelectLocationFragment : OnMapReadyCallback, Fragment() {
                 Timber.d("onRequestPermissionsResult: granted, try to enable my location")
                 enableMyLocation()
             } else {
-//                _viewModel.showErrorMessage.value =
-//                    getString(R.string.permission_denied_explanation)
+                Toast.makeText(
+                    context,
+                    getString(R.string.permission_denied_explanation),
+                    Toast.LENGTH_SHORT
+                ).show()
                 Timber.d("onRequestPermissionsResult: not granted")
             }
         } else {
@@ -182,25 +203,15 @@ class SelectLocationFragment : OnMapReadyCallback, Fragment() {
         }
     }
 
-//    private fun setPoiClick() {
-//        Timber.d("setPoiClick")
-//        map.setOnPoiClickListener { poi ->
-//            selectedPOI = poi
-//            selectedLatLng = poi.latLng
-//            selectedLocation = poi.name
-//            marker?.remove()
-//            map.addMarker(
-//                MarkerOptions()
-//                    .position(poi.latLng)
-//                    .title(poi.name)
-//            ).let {
-//                it.showInfoWindow()
-//                marker = it
-//            }
-//
-//            binding.selectLocationButtonSave.visibility = View.VISIBLE
-//        }
-//    }
+    private fun setMarker(latLng: LatLng, location: String?) {
+        marker?.remove()
+        marker = map.addMarker(
+            MarkerOptions()
+                .position(latLng)
+                .title(getString(R.string.dropped_pin))
+                .snippet(location)
+        )
+    }
 
     private fun setMapOnClick() {
         map.setOnMapClickListener { latLng ->
@@ -210,17 +221,10 @@ class SelectLocationFragment : OnMapReadyCallback, Fragment() {
                 latLng.latitude,
                 latLng.longitude
             )
-            selectedPOI = null
             selectedLatLng = latLng
             selectedLocation = snippet
 
-            marker?.remove()
-            marker = map.addMarker(
-                MarkerOptions()
-                    .position(latLng)
-                    .title(getString(R.string.dropped_pin))
-                    .snippet(snippet)
-            )
+            setMarker(latLng, snippet)
 
             binding.selectLocationButtonSave.visibility = View.VISIBLE
         }

@@ -11,6 +11,8 @@ import com.aortiz.android.thermosmart.authentication.AuthenticationActivity
 import com.aortiz.android.thermosmart.databinding.ThermostatListFragmentBinding
 import com.aortiz.android.thermosmart.utils.setDisplayHomeAsUpEnabled
 import com.firebase.ui.auth.AuthUI
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.ktx.Firebase
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
 
@@ -47,7 +49,7 @@ class ThermostatListFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         Timber.i("onViewCreated")
-        binding.lifecycleOwner = this
+        binding.lifecycleOwner = viewLifecycleOwner
         binding.addThermostatButton.setOnClickListener {
             findNavController().navigate(ThermostatListFragmentDirections.actionThermostatListFragmentToThermostatSaveFragment())
         }
@@ -57,6 +59,7 @@ class ThermostatListFragment : Fragment() {
         when (item.itemId) {
             R.id.action_logout -> {
                 AuthUI.getInstance().signOut(requireContext()).addOnCompleteListener {
+                    Firebase.auth.signOut()
                     val intent = Intent(requireContext(), AuthenticationActivity::class.java)
                     startActivity(intent)
                     requireActivity().finish()

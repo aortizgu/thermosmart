@@ -4,7 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-
+        <variable
+            name="viewModel"
+            type="com.aortiz.android.thermosmart.thermostat.config.ThermostatConfigViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

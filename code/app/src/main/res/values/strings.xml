@@ -12,21 +12,33 @@
     <string name="login">Login</string>
     <string name="action_logout">Logout</string>
     <string name="save">Save</string>
-    <string name="thermostat_id">"Thermostat Id "</string>
-    <string name="thermostat_name">Thermostat Name</string>
+    <string name="thermostat_id">Thermostat Id</string>
+    <string name="thermostat_name_hint">Thermostat Name</string>
+    <string name="thermostat_name">Name: </string>
     <string name="thermostat_location">Thermostat Location</string>
     <string name="show_in_fahrenheit_key">show_in_fahrenheit_key</string>
     <string name="shared_preferences">shared_preferences</string>
     <string name="units">Set Temperature Unit</string>
     <string name="action_remove">Remove</string>
     <string name="exterior">Exterior</string>
-    <string name="thermostat_state">"State: "</string>
-    <string name="thermostat_threshold">"Threshold: "</string>
-    <string name="config_threshold">"Threshold: "</string>
+    <string name="thermostat_state">State: </string>
+    <string name="thermostat_threshold">Threshold: </string>
+    <string name="config_threshold">Threshold: </string>
     <string name="dropped_pin">Thermostat Location</string>
     <bool name="show_in_fahrenheit">false</bool>
     <string name="normal_map">Normal Map</string>
     <string name="hybrid_map">Hybrid Map</string>
     <string name="satellite_map">Satellite Map</string>
     <string name="terrain_map">Terrain Map</string>
+
+    <string name="emulator_db_url">http://10.0.2.2:9001/?ns=thermosmart-b5382-default-rtdb</string>
+    <string name="db_url">https://thermosmart-b5382-default-rtdb.europe-west1.firebasedatabase.app</string>
+    <string name="permission_denied_explanation">You need to grant location permission in order to select the location.</string>
+    <string name="error_adding_thermostat">Error adding thermostat</string>
+    <string name="error_removing_thermostat">Error removing thermostat</string>
+    <string name="already_following">Already following device</string>
+    <string name="invalid_device">Invalid device</string>
+    <string name="invlid_user">Invalid User</string>
+    <string name="not_following">Not following</string>
+    <string name="default_notification_channel_id">com.google.firebase.messaging.default_notification_channel_id_0</string>
 </resources>
