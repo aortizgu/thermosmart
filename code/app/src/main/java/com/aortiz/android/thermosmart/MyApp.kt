@@ -2,7 +2,6 @@ package com.aortiz.android.thermosmart
 
 import android.app.Application
 import android.content.pm.PackageManager
-import android.util.Log
 import com.aortiz.android.thermosmart.authentication.AuthenticationViewModel
 import com.aortiz.android.thermosmart.config.AppConfigViewModel
 import com.aortiz.android.thermosmart.database.local.SharedPreferencesDatabase
@@ -23,7 +22,7 @@ class MyApp : Application() {
     override fun onCreate() {
         super.onCreate()
         Timber.plant(Timber.DebugTree())
-        var openweatherApiKey : String = ""
+        var openweatherApiKey: String = ""
         try {
             val ai = packageManager.getApplicationInfo(
                 this.packageName,
@@ -32,7 +31,7 @@ class MyApp : Application() {
             val bundle = ai.metaData
             openweatherApiKey = bundle.getString("openweather.API_KEY")!!
         } catch (e: Exception) {
-            Timber.e("Don't forget to configure <meta-data android:name=\"openweather.API_KEY\" android:value=\"testValue\"/> in your AndroidManifest.xml file."            )
+            Timber.e("Don't forget to configure <meta-data android:name=\"openweather.API_KEY\" android:value=\"testValue\"/> in your AndroidManifest.xml file.")
         }
 
         val myModule = module {

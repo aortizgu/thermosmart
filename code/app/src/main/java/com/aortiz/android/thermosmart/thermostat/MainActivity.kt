@@ -6,13 +6,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.NavHostFragment
 import com.aortiz.android.thermosmart.R
 import kotlinx.android.synthetic.main.activity_main.*
-import android.util.Log
-
-import android.content.pm.PackageManager
-
-import android.content.pm.ApplicationInfo
-
-
 
 
 class MainActivity : AppCompatActivity() {

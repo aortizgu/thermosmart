@@ -19,11 +19,11 @@ class ThermostatDetailViewModel(
         it.asDomainModel()
     }
 
-    val cityName : LiveData<String?> = repository.cityName
-    val exteriorImage : LiveData<String?> = repository.exteriorImage
-    val exteriorTemp : LiveData<Double?> = repository.exteriorTemp
+    val cityName: LiveData<String?> = repository.cityName
+    val exteriorImage: LiveData<String?> = repository.exteriorImage
+    val exteriorTemp: LiveData<Double?> = repository.exteriorTemp
 
-    fun loadWeatherData (lat: Double, lon: Double) {
+    fun loadWeatherData(lat: Double, lon: Double) {
         viewModelScope.launch {
             repository.loadWeatherData(lat, lon)
         }

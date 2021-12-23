@@ -41,7 +41,7 @@
   </head>
   <body>
     <div id="message">
-      <h2>temperature read value for device 1</h2>
+      <h2>temperature read value for "dev1"</h2>
       <a>active: <span id="active"></span></a>
       <a>threshold: <span id="threshold"></span></a>
       <b id="increasethreshold">+</b>
@@ -76,19 +76,19 @@
           });
         }
 
-        const activePath = '/root/devices/devicetestuuid1/status/active'
+        const activePath = '/root/devices/dev1/status/active'
         firebase.database().ref(activePath).on('value', snapshot => {
           document.querySelector('#active').textContent = snapshot.val()
         });
 
-        const thresholdPath = '/root/devices/devicetestuuid1/configuration/threshold'
+        const thresholdPath = '/root/devices/dev1/configuration/threshold'
         firebase.database().ref(thresholdPath).on('value', snapshot => {
           document.querySelector('#threshold').textContent = snapshot.val()
         });
         document.querySelector('#increasethreshold').onclick = function () { addVal(thresholdPath, 0.5); };
         document.querySelector('#decreasethreshold').onclick = function () { addVal(thresholdPath, -0.5); };
 
-        const temperaturePath = '/root/devices/devicetestuuid1/status/temperature'
+        const temperaturePath = '/root/devices/dev1/status/temperature'
         firebase.database().ref(temperaturePath).on('value', snapshot => {
           document.querySelector('#temperature').textContent = snapshot.val()
         });

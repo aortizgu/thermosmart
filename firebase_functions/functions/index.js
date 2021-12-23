@@ -80,66 +80,81 @@ exports.ondevicetemp = functions.database.ref("/root/devices/{devId}/status/temp
 
 exports.ondeviceactive = functions.database.ref("/root/devices/{devId}/status/active")
   .onUpdate((snap, context) => {
-    functions.logger.info("change in device ", context.params.devId, " active from ", snap.before.val(), " to ", snap.after.val());
+    console.log("change in device ", context.params.devId, " active from ", snap.before.val(), " to ", snap.after.val());
     const appOptions = JSON.parse(process.env.FIREBASE_CONFIG);
     appOptions.databaseAuthVariableOverride = context.auth;
     const app = admin.initializeApp(appOptions, "app");
     const deleteApp = () => app.delete().catch(() => null);
-    const folowersRef = snap.after.ref.parent.parent.child("configuration").child("followers");
-    const payload = {
-      notification: {
-        title: "here Title",
-        body: "here body",
-      },
-    };
-    return app.database().ref(folowersRef).get().then((folowersSnapshot) => {
-      console.log("ondeviceactive: iterate over device followers");
-      const folowersPromises = [];
-      folowersSnapshot.forEach((folowerSnapshot) => {
-        const followerVal = folowerSnapshot.val();
-        folowersPromises.push(new Promise((resolve) => {
-          console.log("ondeviceactive: iterate over follower " + followerVal + " devices");
-          app.database().ref("/root/users/" + followerVal + "/tokens").get().then((tokensSnapshot) => {
-            const tokens = Object.values(tokensSnapshot.val());
-            console.log("ondeviceactive: sending notification to user " + followerVal + " device tokens " + tokens);
-            app.messaging().sendToDevice(tokens, payload).then((response) => {
-              const tokensToRemove = [];
-              response.results.forEach((result, index) => {
-                const error = result.error;
-                if (error) {
-                  console.log("Failure sending notification to", tokens[index], error);
-                  // Cleanup the tokens who are not registered anymore.
-                  if (error.code === "messaging/invalid-registration-token" ||
-                    error.code === "messaging/registration-token-not-registered") {
-                    tokensToRemove.push(tokensSnapshot.ref.child(tokens[index]).remove());
-                  }
-                }
-              });
-              return Promise.all(tokensToRemove).then(() => {
-                console.log("ondeviceactive: exit from tokens to remove " + tokensSnapshot.ref);
-              }).catch((err) => {
-                console.log("ondeviceactive: error when exit from tokens to remove " + tokensSnapshot.ref + " error " + err);
-              });
-            }).then(() => {
-              console.log("ondeviceactive: exit from " + tokensSnapshot.ref);
-              return resolve();
+    const deviceNameRef = snap.after.ref.parent.parent.child("configuration").child("name");
+    return app.database().ref(deviceNameRef).get().then((deviceNameSnapshot) => {
+      const deviceNameVal = deviceNameSnapshot.val();
+      const message = "Thermostat " + deviceNameVal + " has been " + (snap.after.val() ? "activated" : "deactivated");
+      const payload = {
+        data: {
+          title: snap.after.val() ? "Activated" : "Deactivated",
+          body: message,
+          thermostat: context.params.devId,
+        },
+      };
+      const folowersRef = snap.after.ref.parent.parent.child("configuration").child("followers");
+      return app.database().ref(folowersRef).get().then((folowersSnapshot) => {
+        console.log("ondeviceactive: iterate over device followers");
+        const folowersPromises = [];
+        folowersSnapshot.forEach((folowerSnapshot) => {
+          const followerVal = folowerSnapshot.val();
+          folowersPromises.push(new Promise((resolve) => {
+            console.log("ondeviceactive: iterate over follower " + followerVal + " devices");
+            app.database().ref("/root/users/" + followerVal + "/token").get().then((tokensSnapshot) => {
+              const token = tokensSnapshot.val();
+              if (token) {
+                console.log("ondeviceactive: sending notification to user " + followerVal + ", device token " + token);
+                app.messaging().sendToDevice(token, payload).then((response) => {
+                  const tokensToRemove = [];
+                  response.results.forEach((result, index) => {
+                    const error = result.error;
+                    if (error) {
+                      console.log("Failure sending notification to", token, error);
+                      // Cleanup the tokens who are not registered anymore.
+                      if (error.code === "messaging/invalid-registration-token" ||
+                        error.code === "messaging/registration-token-not-registered") {
+                        tokensToRemove.push(tokensSnapshot.ref.child(token).remove());
+                      }
+                    }
+                  });
+                  return Promise.all(tokensToRemove).then(() => {
+                    console.log("ondeviceactive: exit from tokens to remove " + tokensSnapshot.ref);
+                  }).catch((err) => {
+                    console.log("ondeviceactive: error when exit from tokens to remove " + tokensSnapshot.ref + " error " + err);
+                  });
+                }).then(() => {
+                  console.log("ondeviceactive: exit from " + tokensSnapshot.ref);
+                  return resolve();
+                }).catch((err) => {
+                  console.log("ondeviceactive: error when exit from " + tokensSnapshot.ref + " error " + err);
+                  return resolve();
+                });
+              } else {
+                console.log("ondeviceactive: invalid token from " + followerVal);
+                return resolve();
+              }
             }).catch((err) => {
-              console.log("ondeviceactive: error when exit from " + tokensSnapshot.ref + " error " + err);
+              console.log("ondeviceactive: error " + err);
               return resolve();
             });
-          }).catch((err) => {
-            console.log("ondeviceactive: error " + err);
-            return resolve();
-          });
-        }));
-      });
-      return Promise.all(folowersPromises).then(() => {
-        console.log("ondeviceactive: exit from folowersPromises");
+          }));
+        });
+        return Promise.all(folowersPromises).then(() => {
+          console.log("ondeviceactive: exit from folowersPromises");
+        }).catch((err) => {
+          console.log("ondeviceactive: error when exit from folowersPromises error " + err);
+        });
+      }).then(() => {
+        console.log("ondeviceactive: exit from " + folowersRef);
       }).catch((err) => {
-        console.log("ondeviceactive: error when exit from folowersPromises error " + err);
+        console.log("ondeviceactive: error" + err);
       });
     }).then(() => {
-      console.log("ondeviceactive: exit from " + folowersRef);
+      console.log("ondeviceactive: exit from " + deviceNameRef);
       return deleteApp();
     }).catch((err) => {
       console.log("ondeviceactive: error" + err);

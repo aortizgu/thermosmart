@@ -2,7 +2,6 @@ package com.aortiz.android.thermosmart.config
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
-import com.aortiz.android.thermosmart.database.local.SharedPreferencesDatabase
 import com.aortiz.android.thermosmart.repository.ThermostatRepository
 
 class AppConfigViewModel(

@@ -46,4 +46,5 @@
     <string name="unit_cels">º C</string>
     <string name="unit_far">ºF</string>
     <string name="location">Location:</string>
+    <string name="thermostat_temperature">Temperature: </string>
 </resources>

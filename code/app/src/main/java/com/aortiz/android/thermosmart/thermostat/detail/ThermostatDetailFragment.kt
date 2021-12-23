@@ -33,7 +33,7 @@ class ThermostatDetailFragment : Fragment() {
             )
         binding.viewModel = viewModel
         viewModel.thermostat.observe(viewLifecycleOwner, { thermostat ->
-            if (thermostat.latitude != null  && thermostat.longitude != null){
+            if (thermostat.latitude != null && thermostat.longitude != null) {
                 viewModel.loadWeatherData(thermostat.latitude!!, thermostat.longitude!!)
             }
         })

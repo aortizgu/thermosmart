@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.view.*
 import android.widget.SeekBar
 import android.widget.Toast
-import androidx.databinding.BindingAdapter
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
@@ -44,7 +43,7 @@ class ThermostatConfigFragment : Fragment() {
             )
         binding.configThresholdSeekBar.progress =
             getProgressFromThreshold(thermostat.threshold ?: MIN_THRESHOLD)
-        thermostat.threshold?.let{
+        thermostat.threshold?.let {
             BindingAdapters.setTempText(binding.configThresholdValTextView, it)
         }
         binding.viewModel = viewModel

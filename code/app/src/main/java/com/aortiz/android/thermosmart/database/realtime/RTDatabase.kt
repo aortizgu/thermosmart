@@ -19,9 +19,8 @@ import timber.log.Timber
 class RTDatabase(context: Context) {
 
     private var database: FirebaseDatabase =
-        Firebase.database(context.getString(R.string.emulator_db_url))
-
-    var userThermostatList: LiveData<List<DBThermostat?>?>
+        Firebase.database(context.getString(R.string.db_url))
+        //Firebase.database(context.getString(R.string.emulator_db_url))
 
     companion object {
         const val ROOT_REFERENCE = "root"
@@ -35,16 +34,6 @@ class RTDatabase(context: Context) {
 
     init {
         database.setPersistenceEnabled(true)
-        userThermostatList = FirebaseDatabaseLiveData(
-            database.getReference("$ROOT_REFERENCE"),
-            DBSnapShot::class.java
-        ).map { snapShot ->
-            Firebase.auth.currentUser?.uid?.let { uid ->
-                snapShot.devices?.values?.toList()?.filter { device ->
-                    device.configuration?.followers?.contains(uid) == true
-                }
-            }
-        }
     }
 
     fun load() {
@@ -56,9 +45,9 @@ class RTDatabase(context: Context) {
             database.getReference("$ROOT_REFERENCE/$USERS_REFERENCE/$uid/$ID_REFERENCE")
                 .setValue(uid)
                 .addOnSuccessListener {
-                    Timber.d("checkUser: updated")
+                    Timber.i("checkUser: updated")
                 }.addOnFailureListener {
-                    Timber.d("checkUser: error $it")
+                    Timber.e("checkUser: error $it")
                 }
         }
     }
@@ -70,10 +59,39 @@ class RTDatabase(context: Context) {
         )
     }
 
+    fun getUserThermostatListLiveData(): LiveData<List<DBThermostat>>{
+        return FirebaseDatabaseLiveData(
+            database.getReference("$ROOT_REFERENCE"),
+            DBSnapShot::class.java
+        ).map { snapShot ->
+            val uid = Firebase.auth.currentUser?.uid
+            if (uid != null) {
+                val deviceList = snapShot.devices?.values?.toList()
+                if (deviceList != null){
+                    return@map deviceList.filter { device ->
+                        val deviceFollowers = device.configuration?.followers
+                        if (deviceFollowers != null) {
+                            return@filter deviceFollowers.contains(uid)
+                        } else {
+                            Timber.e("not valid deviceFollowers")
+                            return@filter false
+                        }
+                    }
+                } else {
+                    Timber.e("not valid deviceList")
+                    return@map emptyList()
+                }
+            } else {
+                Timber.e("not valid Firebase.auth.currentUser")
+                return@map emptyList()
+            }
+        }
+    }
+
     fun getThermostat(thermostatId: String, cb: (result: OperationResult<DBThermostat>) -> Unit) {
         database.getReference("$ROOT_REFERENCE/$DEVICES_REFERENCE/$thermostatId").get()
             .addOnSuccessListener { dataSnapshot ->
-                Timber.i("getThermostat: success")
+                Timber.d("getThermostat: success")
                 var thermostat = dataSnapshot.getValue(DBThermostat::class.java)
                 if (thermostat != null) {
                     cb(OperationResult.Success(thermostat))
@@ -89,7 +107,7 @@ class RTDatabase(context: Context) {
                 Timber.e("getThermostat: Error getting data $it")
                 cb(
                     OperationResult.Error(
-                        Exception("Error getting datat")
+                        Exception("Error getting data")
                     )
                 )
             }

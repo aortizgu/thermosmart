@@ -17,7 +17,7 @@ import org.koin.core.inject
 object BindingAdapters {
 
     private object ThermostatRepositoryInstance : KoinComponent {
-        val repository : ThermostatRepository by inject()
+        val repository: ThermostatRepository by inject()
     }
 
     @BindingAdapter("listData")
@@ -64,19 +64,21 @@ object BindingAdapters {
 
     @BindingAdapter("tempText")
     @JvmStatic
-    fun setTempText(textView: TextView, celsiusValue : Double) {
+    fun setTempText(textView: TextView, celsiusValue: Double) {
         val farEnabled = ThermostatRepositoryInstance.repository.getShowInFahrenheitConfig()
         val units = if (farEnabled) "ºF" else "ºC"
-        val value = if (farEnabled) celsiusValue+32 else celsiusValue
+        val value = if (farEnabled) celsiusValue + 32 else celsiusValue
         textView.text = "${value.format(2)} $units"
     }
+
     @BindingAdapter("tempText")
     @JvmStatic
-    fun setTempText(textView: TextView, celsiusValueLiveData : LiveData<Double>) {
+    fun setTempText(textView: TextView, celsiusValueLiveData: LiveData<Double>) {
         celsiusValueLiveData.value?.let {
             setTempText(textView, it)
         }
     }
+
     private fun Double.format(digits: Int) = "%.${digits}f".format(this)
 
     @BindingAdapter("goneIfNotNull")

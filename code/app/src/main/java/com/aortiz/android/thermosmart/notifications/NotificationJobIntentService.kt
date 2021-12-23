@@ -5,8 +5,6 @@ import android.content.Intent
 import androidx.core.app.JobIntentService
 import com.aortiz.android.thermosmart.repository.ThermostatRepository
 import com.aortiz.android.thermosmart.utils.OperationResult
-import com.google.android.gms.location.Geofence
-import com.google.android.gms.location.GeofencingEvent
 import kotlinx.coroutines.*
 import org.koin.android.ext.android.inject
 import timber.log.Timber

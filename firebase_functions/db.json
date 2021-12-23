@@ -1,41 +1,58 @@
 {
     "root": {
         "devices": {
-            "devicetestuuid1": {
+            "dev1": {
                 "configuration": {
-                    "enabled": true,
                     "followers": [
-                        "usertestuuid1",
-                        "usertestuuid2"
+                        "usertestuuid2",
+                        "BkYqhvhCuka4ImcL9nouSJmNtJA2",
+                        "gjPSF3kyJDVhA35sIA0HB0PXYGV2"
                     ],
-                    "threshold": 20.5
+                    "lat": 37.427451733780586,
+                    "location": "Lat: 37.42745, Long: -122.08050",
+                    "lon": -122.08050157874823,
+                    "name": "Dev1",
+                    "threshold": 24.5
                 },
+                "id": "dev1",
                 "status": {
-                    "active": false,
-                    "records": {
-                        "1639648785": {
-                            "active": false,
-                            "temperature": 0.0
-                        }
-                    },
-                    "temperature": 20.0
+                    "active": true,
+                    "temperature": 24
+                }
+            },
+            "dev2": {
+                "configuration": {
+                    "followers": [
+                        "usertestuuid2",
+                        "BkYqhvhCuka4ImcL9nouSJmNtJA2",
+                        "oDGTpyP6AEZVf4YgFSyD1fbEPiw1",
+                        "gjPSF3kyJDVhA35sIA0HB0PXYGV2"
+                    ],
+                    "lat": 37.427451733780586,
+                    "location": "Lat: 37.42745, Long: -122.08050",
+                    "lon": -122.08050157874823,
+                    "name": "My test devicetestuuid2",
+                    "threshold": 26.2
+                },
+                "id": "dev2",
+                "status": {
+                    "active": true,
+                    "temperature": 21
                 }
             }
         },
         "users": {
-            "usertestuuid1": {
-                "devices": [
-                    "devicetestuuid1"
-                ],
-                "tokens": [
-                    "usertestuuid1token0"
-                ]
+            "BkYqhvhCuka4ImcL9nouSJmNtJA2": {
+                "id": "BkYqhvhCuka4ImcL9nouSJmNtJA2",
+                "token": "fb856smqSXC0jhD5M_MtjX:APA91bGqZ4qqGw5gF70M45hVLMZYlRa_D-xx2VkT1JtCreLNA81k84Qp2zi41kgaOcrogqDXNh8W9dqzgDelfVthC3bLffhj7cxrBstNTT0V831zdIlmjzZhF849KhejdSfSNSeoXbvS"
             },
-            "usertestuuid2": {
-                "tokens": [
-                    "usertestuuid2token0",
-                    "usertestuuid2token1"
-                ]
+            "gjPSF3kyJDVhA35sIA0HB0PXYGV2": {
+                "id": "gjPSF3kyJDVhA35sIA0HB0PXYGV2",
+                "token": "cnYbiNf-R4CQF2y4-9eVTJ:APA91bEKU1fkZhkDoIQY0YCNHcW-nCSmCOsUB6NhLICAct356O4HVsp6tBC1Hi3xT8Op8SUaE30WYYksTubttaNd7jlTGFNKOuMBOiimub1TNRwoPdFzB6ZVjGL1D8yEp8LjO-jeWyRj"
+            },
+            "oDGTpyP6AEZVf4YgFSyD1fbEPiw1": {
+                "id": "oDGTpyP6AEZVf4YgFSyD1fbEPiw1",
+                "token": "cnYbiNf-R4CQF2y4-9eVTJ:APA91bEKU1fkZhkDoIQY0YCNHcW-nCSmCOsUB6NhLICAct356O4HVsp6tBC1Hi3xT8Op8SUaE30WYYksTubttaNd7jlTGFNKOuMBOiimub1TNRwoPdFzB6ZVjGL1D8yEp8LjO-jeWyRj"
             }
         }
     }

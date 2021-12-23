@@ -1,7 +1,6 @@
 package com.aortiz.android.thermosmart.notifications
 
 import android.content.Intent
-import com.aortiz.android.thermosmart.notifications.NotificationJobIntentService
 import com.aortiz.android.thermosmart.repository.ThermostatRepository
 import com.aortiz.android.thermosmart.thermostat.MainActivity
 import com.aortiz.android.thermosmart.utils.OperationResult

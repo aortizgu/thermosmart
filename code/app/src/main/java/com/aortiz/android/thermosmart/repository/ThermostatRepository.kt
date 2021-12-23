@@ -19,13 +19,11 @@ import java.net.SocketTimeoutException
 import java.net.UnknownHostException
 
 
-class ThermostatRepository(private val spdb: SharedPreferencesDatabase, private val rtdb: RTDatabase, val openweatherApiKey: String) {
-
-    val thermostatList = rtdb.userThermostatList.map { list ->
-        list?.map {
-            it?.asDomainModel()
-        }
-    }
+class ThermostatRepository(
+    private val spdb: SharedPreferencesDatabase,
+    private val rtdb: RTDatabase,
+    val openweatherApiKey: String
+) {
 
     private var _cityName = MutableLiveData<String?>()
     val cityName: LiveData<String?>
@@ -45,7 +43,7 @@ class ThermostatRepository(private val spdb: SharedPreferencesDatabase, private 
             _cityName.postValue(data.name)
             _exteriorTemp.postValue(data.main.temp.toDouble())
             if (!data.weather.isNullOrEmpty()) {
-                val imageUrl =  Network.getImageUrl(data.weather.first().icon)
+                val imageUrl = Network.getImageUrl(data.weather.first().icon)
                 _exteriorImage.postValue(imageUrl)
             }
         }
@@ -67,6 +65,16 @@ class ThermostatRepository(private val spdb: SharedPreferencesDatabase, private 
 
     fun getThermostatLiveData(thermostatId: String): FirebaseDatabaseLiveData<DBThermostat> {
         return rtdb.getThermostatLiveData(thermostatId)
+    }
+
+    fun getUserThermostatListLiveData(): LiveData<List<Thermostat>>{
+        return rtdb.getUserThermostatListLiveData().map { list ->
+            Timber.i("list size ${list.size}")
+            list.map{ item ->
+                Timber.i("item id ${item.id}")
+                item.asDomainModel()
+            }
+        }
     }
 
     fun getThermostat(thermostatId: String, cb: (result: OperationResult<DBThermostat>) -> Unit) {
@@ -105,7 +113,7 @@ class ThermostatRepository(private val spdb: SharedPreferencesDatabase, private 
     fun unloadWeatherData() {
         _cityName.postValue(null)
         _exteriorTemp.postValue(null)
-       _exteriorImage.postValue(null)
+        _exteriorImage.postValue(null)
     }
 
 }

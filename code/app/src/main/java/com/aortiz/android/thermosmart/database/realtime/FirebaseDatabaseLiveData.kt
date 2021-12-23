@@ -38,11 +38,15 @@ class FirebaseDatabaseLiveData<T> private constructor(
 
     override fun onActive() {
         super.onActive()
+        Timber.d("onActive $reference")
+        reference.keepSynced(true)
         reference.addValueEventListener(listener)
     }
 
     override fun onInactive() {
         super.onInactive()
+        Timber.d("onInactive $reference")
+        reference.keepSynced(false)
         reference.removeEventListener(listener)
     }
 }
