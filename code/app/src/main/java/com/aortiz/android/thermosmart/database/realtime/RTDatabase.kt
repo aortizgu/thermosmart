@@ -63,11 +63,36 @@ class RTDatabase(context: Context) {
         }
     }
 
-    fun getThermostat(thermostatId: String): FirebaseDatabaseLiveData<DBThermostat> {
+    fun getThermostatLiveData(thermostatId: String): FirebaseDatabaseLiveData<DBThermostat> {
         return FirebaseDatabaseLiveData(
             database.getReference("$ROOT_REFERENCE/$DEVICES_REFERENCE/$thermostatId"),
             DBThermostat::class.java
         )
+    }
+
+    fun getThermostat(thermostatId: String, cb: (result: OperationResult<DBThermostat>) -> Unit) {
+        database.getReference("$ROOT_REFERENCE/$DEVICES_REFERENCE/$thermostatId").get()
+            .addOnSuccessListener { dataSnapshot ->
+                Timber.i("getThermostat: success")
+                var thermostat = dataSnapshot.getValue(DBThermostat::class.java)
+                if (thermostat != null) {
+                    cb(OperationResult.Success(thermostat))
+                } else {
+                    Timber.e("getThermostat: null thermostat")
+                    cb(
+                        OperationResult.Error(
+                            Exception("null thermostat")
+                        )
+                    )
+                }
+            }.addOnFailureListener {
+                Timber.e("getThermostat: Error getting data $it")
+                cb(
+                    OperationResult.Error(
+                        Exception("Error getting datat")
+                    )
+                )
+            }
     }
 
     fun setThermostatConfig(id: String?, configuration: DBThermostatConfiguration?) {

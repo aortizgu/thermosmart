@@ -15,8 +15,12 @@ class ThermostatRepository(private val rtdb: RTDatabase) {
         }
     }
 
-    fun getThermostat(thermostatId: String): FirebaseDatabaseLiveData<DBThermostat> {
-        return rtdb.getThermostat(thermostatId)
+    fun getThermostatLiveData(thermostatId: String): FirebaseDatabaseLiveData<DBThermostat> {
+        return rtdb.getThermostatLiveData(thermostatId)
+    }
+
+    fun getThermostat(thermostatId: String, cb: (result: OperationResult<DBThermostat>) -> Unit) {
+        return rtdb.getThermostat(thermostatId, cb)
     }
 
     fun setThermostatConfig(thermostat: Thermostat) {

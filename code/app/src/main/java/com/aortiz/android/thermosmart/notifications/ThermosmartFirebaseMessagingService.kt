@@ -1,6 +1,9 @@
-package com.aortiz.android.thermosmart
+package com.aortiz.android.thermosmart.notifications
 
+import android.content.Intent
+import com.aortiz.android.thermosmart.notifications.NotificationJobIntentService
 import com.aortiz.android.thermosmart.repository.ThermostatRepository
+import com.aortiz.android.thermosmart.thermostat.MainActivity
 import com.aortiz.android.thermosmart.utils.OperationResult
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
@@ -9,18 +12,16 @@ import com.google.firebase.messaging.RemoteMessage
 import org.koin.android.ext.android.inject
 import timber.log.Timber
 
+
 class ThermosmartFirebaseMessagingService : FirebaseMessagingService() {
 
-    val repository: ThermostatRepository by inject()
+    private val repository: ThermostatRepository by inject()
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         Timber.d("From: ${remoteMessage?.from}")
         remoteMessage?.data?.let {
             Timber.d("Message data payload: " + remoteMessage.data)
-        }
-        remoteMessage?.notification?.let {
-            Timber.d("Message Notification Body: ${it.body}")
-            sendNotification(it.body!!)
+            sendNotification(it)
         }
     }
 
@@ -29,12 +30,12 @@ class ThermosmartFirebaseMessagingService : FirebaseMessagingService() {
         repository.updateDeviceToken(token)
     }
 
-    private fun sendNotification(messageBody: String) {
-//        val notificationManager = ContextCompat.getSystemService(
-//            applicationContext,
-//            NotificationManager::class.java
-//        ) as NotificationManager
-//        notificationManager.sendNotification(messageBody, applicationContext)
+    private fun sendNotification(mutableMap: MutableMap<String, String>) {
+        val intent = Intent(this, MainActivity::class.java)
+        intent.putExtra("title", mutableMap["title"])
+        intent.putExtra("body", mutableMap["body"])
+        intent.putExtra("thermostat", mutableMap["thermostat"])
+        NotificationJobIntentService.enqueueWork(this, intent)
     }
 
     companion object {

@@ -13,7 +13,7 @@ class ThermostatDetailViewModel(
     thermostatId: String
 ) : AndroidViewModel(app) {
 
-    val thermostat: LiveData<Thermostat> = repository.getThermostat(thermostatId).map {
+    val thermostat: LiveData<Thermostat> = repository.getThermostatLiveData(thermostatId).map {
         it.asDomainModel()
     }
 
