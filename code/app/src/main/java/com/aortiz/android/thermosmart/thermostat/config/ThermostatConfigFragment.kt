@@ -4,12 +4,14 @@ import android.os.Bundle
 import android.view.*
 import android.widget.SeekBar
 import android.widget.Toast
+import androidx.databinding.BindingAdapter
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.aortiz.android.thermosmart.R
 import com.aortiz.android.thermosmart.databinding.ThermostatConfigFragmentBinding
 import com.aortiz.android.thermosmart.domain.Thermostat
+import com.aortiz.android.thermosmart.utils.BindingAdapters
 import com.aortiz.android.thermosmart.utils.ERROR_CODE
 import com.aortiz.android.thermosmart.utils.setDisplayHomeAsUpEnabled
 import org.koin.android.ext.android.inject
@@ -42,7 +44,9 @@ class ThermostatConfigFragment : Fragment() {
             )
         binding.configThresholdSeekBar.progress =
             getProgressFromThreshold(thermostat.threshold ?: MIN_THRESHOLD)
-        binding.configThresholdValTextView.text = "${thermostat.threshold.toString()} ºC"
+        thermostat.threshold?.let{
+            BindingAdapters.setTempText(binding.configThresholdValTextView, it)
+        }
         binding.viewModel = viewModel
         viewModel.initData(thermostat)
         return binding.root
@@ -60,7 +64,7 @@ class ThermostatConfigFragment : Fragment() {
             SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar, i: Int, b: Boolean) {
                 val scaled = getThresholdFromProgress(i)
-                binding.configThresholdValTextView.text = "${scaled.toString()} ºC"
+                BindingAdapters.setTempText(binding.configThresholdValTextView, scaled)
                 thermostat.threshold = scaled
             }
 

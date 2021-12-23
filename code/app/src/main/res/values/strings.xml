@@ -12,13 +12,14 @@
     <string name="login">Login</string>
     <string name="action_logout">Logout</string>
     <string name="save">Save</string>
-    <string name="thermostat_id">Thermostat Id</string>
+    <string name="insert_thermostat_id">Thermostat Id</string>
     <string name="thermostat_name_hint">Thermostat Name</string>
+    <string name="thermostat_id">Id: </string>
     <string name="thermostat_name">Name: </string>
-    <string name="thermostat_location">Thermostat Location</string>
+    <string name="thermostat_location">Select location</string>
     <string name="show_in_fahrenheit_key">show_in_fahrenheit_key</string>
     <string name="shared_preferences">shared_preferences</string>
-    <string name="units">Set Temperature Unit</string>
+    <string name="units">Set temperature units: </string>
     <string name="action_remove">Remove</string>
     <string name="exterior">Exterior</string>
     <string name="thermostat_state">State: </string>
@@ -41,4 +42,8 @@
     <string name="invlid_user">Invalid User</string>
     <string name="not_following">Not following</string>
     <string name="default_notification_channel_id">com.google.firebase.messaging.default_notification_channel_id_0</string>
+    <string name="insert_device_id">Insert a valid thermostat ID</string>
+    <string name="unit_cels">º C</string>
+    <string name="unit_far">ºF</string>
+    <string name="location">Location:</string>
 </resources>

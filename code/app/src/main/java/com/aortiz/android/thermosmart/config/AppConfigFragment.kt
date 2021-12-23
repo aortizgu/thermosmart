@@ -37,7 +37,7 @@ class AppConfigFragment : Fragment() {
         Timber.i("onViewCreated")
         binding.lifecycleOwner = viewLifecycleOwner
         binding.saveAppSettingsButton.setOnClickListener {
-            viewModel.showInFahrenheit = binding.toggleButton.isChecked
+            viewModel.showInFahrenheit = binding.farRadioButton.isChecked
             findNavController().popBackStack()
         }
     }

@@ -19,9 +19,12 @@ class ThermosmartFirebaseMessagingService : FirebaseMessagingService() {
 
     override fun onMessageReceived(remoteMessage: RemoteMessage) {
         Timber.d("From: ${remoteMessage?.from}")
-        remoteMessage?.data?.let {
+
+        if (!remoteMessage.data.isNullOrEmpty()) {
             Timber.d("Message data payload: " + remoteMessage.data)
-            sendNotification(it)
+            sendNotification(remoteMessage.data)
+        } else {
+            Timber.e("Message data payload null or empty")
         }
     }
 

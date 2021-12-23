@@ -4,12 +4,10 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
-
         <variable
             name="viewModel"
             type="com.aortiz.android.thermosmart.thermostat.detail.ThermostatDetailViewModel" />
     </data>
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -19,83 +17,100 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginStart="@dimen/margin_normal"
+            android:layout_marginTop="@dimen/margin_big"
             android:layout_marginEnd="@dimen/margin_normal"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toTopOf="parent"
+            tools:showIn="@layout/thermostat_detail_fragment">
 
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/card"
+                android:padding="@dimen/padding_medium">
+
+                <TextView
+                    android:id="@+id/thermostatIdTextView"
+                    style="@style/data_text_style"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/margin_normal"
+                    android:layout_marginTop="@dimen/margin_normal"
+                    android:text="@string/thermostat_id"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <TextView
+                    android:id="@+id/thermostatIdValueTextView"
+                    style="@style/data_text_style"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/margin_small"
+                    android:text="@{viewModel.thermostat.id}"
+                    app:layout_constraintBaseline_toBaselineOf="@+id/thermostatIdTextView"
+                    app:layout_constraintStart_toEndOf="@+id/thermostatIdTextView"
+                    tools:text="thermostatuuid23455" />
+
+                <TextView
+                    android:id="@+id/thermostatNameTextView"
+                    style="@style/data_text_style"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/margin_normal"
+                    android:layout_marginTop="@dimen/margin_normal"
+                    android:text="@string/thermostat_name"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/thermostatIdTextView" />
+
+                <TextView
+                    android:id="@+id/thermostatNameValueTextView"
+                    style="@style/data_text_style"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/margin_small"
+                    android:text="@{viewModel.thermostat.name}"
+                    app:layout_constraintBaseline_toBaselineOf="@+id/thermostatNameTextView"
+                    app:layout_constraintStart_toEndOf="@+id/thermostatNameTextView"
+                    tools:text="My thermostat" />
+
+                <TextView
+                    android:id="@+id/thermostatThresholdTextView"
+                    style="@style/data_text_style"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/margin_normal"
+                    android:layout_marginTop="@dimen/margin_normal"
+                    android:layout_marginBottom="@dimen/margin_normal"
+                    android:text="@string/thermostat_threshold"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/thermostatNameTextView" />
+
+                <TextView
+                    android:id="@+id/thermostatThresholdValueTextView"
+                    style="@style/data_text_style"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/margin_small"
+                    app:layout_constraintBaseline_toBaselineOf="@+id/thermostatThresholdTextView"
+                    app:layout_constraintStart_toEndOf="@+id/thermostatThresholdTextView"
+                    app:tempText="@{viewModel.thermostat.threshold}"
+                    tools:text="22.5 ºC" />
+
+                <ImageView
+                    android:id="@+id/thermostatStateImageView"
+                    android:layout_width="58dp"
+                    android:layout_height="47dp"
+                    android:layout_marginEnd="@dimen/margin_small"
+                    android:layout_marginBottom="@dimen/margin_small"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:thermostatStatusImage="@{viewModel.thermostat.active}"
+                    tools:src="@drawable/ic_power_off" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.cardview.widget.CardView>
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:padding="@dimen/padding_medium"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/thermostatCardView">
-
-            <TextView
-                android:id="@+id/thermostatStateTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/margin_normal"
-                android:layout_marginLeft="@dimen/margin_normal"
-                android:layout_marginTop="@dimen/margin_normal"
-                android:text="@string/thermostat_state"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <ImageView
-                android:id="@+id/thermostatStateImageView"
-                android:layout_width="29dp"
-                android:layout_height="20dp"
-                android:layout_marginTop="@dimen/margin_normal"
-                android:background="@color/active"
-                app:layout_constraintStart_toEndOf="@+id/thermostatStateTextView"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <TextView
-                android:id="@+id/thermostatNameTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/margin_normal"
-                android:layout_marginLeft="@dimen/margin_normal"
-                android:layout_marginTop="@dimen/margin_normal"
-                android:text="@string/thermostat_name"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/thermostatStateTextView" />
-
-            <TextView
-                android:id="@+id/thermostatNameValueTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@{viewModel.thermostat.name}"
-                app:layout_constraintBaseline_toBaselineOf="@+id/thermostatNameTextView"
-                app:layout_constraintStart_toEndOf="@+id/thermostatNameTextView"
-                tools:text="My thermostat" />
-
-            <TextView
-                android:id="@+id/thermostatThresholdTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="@dimen/margin_normal"
-                android:layout_marginLeft="@dimen/margin_normal"
-                android:layout_marginTop="@dimen/margin_normal"
-                android:text="@string/thermostat_threshold"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/thermostatNameTextView" />
-
-            <TextView
-                android:id="@+id/thermostatThresholdValueTextView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@{viewModel.thermostat.threshold.toString()}"
-                app:layout_constraintBaseline_toBaselineOf="@+id/thermostatThresholdTextView"
-                app:layout_constraintStart_toEndOf="@+id/thermostatThresholdTextView"
-                tools:text="22.5 ºC" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </layout>

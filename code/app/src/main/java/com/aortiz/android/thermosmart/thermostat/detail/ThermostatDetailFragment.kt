@@ -32,6 +32,11 @@ class ThermostatDetailFragment : Fragment() {
                 R.layout.thermostat_detail_fragment, container, false
             )
         binding.viewModel = viewModel
+        viewModel.thermostat.observe(viewLifecycleOwner, { thermostat ->
+            if (thermostat.latitude != null  && thermostat.longitude != null){
+                viewModel.loadWeatherData(thermostat.latitude!!, thermostat.longitude!!)
+            }
+        })
         return binding.root
     }
 
@@ -59,5 +64,10 @@ class ThermostatDetailFragment : Fragment() {
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
         inflater.inflate(R.menu.menu_detail, menu)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        viewModel.unloadWeatherData()
     }
 }
