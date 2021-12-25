@@ -20,6 +20,7 @@ fun sendNotification(context: Context, title: String, body: String, thermostat: 
     val notificationManager = context
         .getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
+    val intId = polynomialRollingHash(thermostat.id?:"")
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O
         && notificationManager.getNotificationChannel(NOTIFICATION_CHANNEL_ID) == null
     ) {
@@ -38,13 +39,13 @@ fun sendNotification(context: Context, title: String, body: String, thermostat: 
         .addParentStack(DetailNotificationActivity::class.java)
         .addNextIntent(intent)
     val notificationPendingIntent = stackBuilder
-        .getPendingIntent(getUniqueId(), PendingIntent.FLAG_UPDATE_CURRENT)
+        .getPendingIntent(intId, PendingIntent.FLAG_UPDATE_CURRENT)
 
     val notification = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID)
-        .setSmallIcon(R.mipmap.ic_launcher)
+        .setSmallIcon(R.drawable.ic_stat_name)
         .setLargeIcon(
             BitmapFactory.decodeResource(
-                context.getResources(),
+                context.resources,
                 R.drawable.ic_heater
             )
         )
@@ -54,7 +55,23 @@ fun sendNotification(context: Context, title: String, body: String, thermostat: 
         .setAutoCancel(true)
         .build()
 
-    notificationManager.notify(getUniqueId(), notification)
+    notificationManager.notify(intId, notification)
 }
 
-private fun getUniqueId() = ((System.currentTimeMillis() % 10000).toInt())
+fun polynomialRollingHash(str: String): Int {
+
+    // P and M
+    val p = 31
+    val m = (1e9 + 9).toInt()
+    var power_of_p = 1
+    var hash_val = 0
+
+    // Loop to calculate the hash value
+    // by iterating over the elements of String
+    for (i in 0 until str.length) {
+        hash_val = (hash_val + (str[i] -
+                'a' + 1) * power_of_p) % m
+        power_of_p = power_of_p * p % m
+    }
+    return hash_val
+}

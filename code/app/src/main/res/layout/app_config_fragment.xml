@@ -38,7 +38,8 @@
             android:layout_marginEnd="@dimen/margin_normal"
             android:layout_marginRight="@dimen/margin_normal"
             android:layout_marginBottom="@dimen/margin_normal"
-            android:background="@color/colorAccent"
+            android:background="@drawable/rounded_button"
+
             android:text="@string/save"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
@@ -59,16 +60,16 @@
                 style="@style/data_text_style"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/unit_cels"
-                android:checked="@{!viewModel.showInFahrenheit}"/>
+                android:checked="@{!viewModel.showInFahrenheit}"
+                android:text="@string/unit_cels" />
 
             <RadioButton
                 android:id="@+id/farRadioButton"
                 style="@style/data_text_style"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/unit_far"
-                android:checked="@{viewModel.showInFahrenheit}"/>
+                android:checked="@{viewModel.showInFahrenheit}"
+                android:text="@string/unit_far" />
         </RadioGroup>
 
 
