@@ -2,12 +2,23 @@
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 
+function getActiveState(activeNow, tempVal, thresholdVal) {
+  let mustActivate = false;
+  const hysteresis = 0.50;
+  if (activeNow) {
+    mustActivate = tempVal < (thresholdVal + hysteresis);
+  } else {
+    mustActivate = tempVal < (thresholdVal - hysteresis);
+  }
+  return mustActivate;
+}
+
 function checkActivation(app, activeRef, tempVal, thresholdVal) {
   return new Promise((resolve) => {
     app.database().ref(activeRef).get().then((value) => {
       const activeVal = value.val();
       console.log("checkActivation: thresholdVal " + thresholdVal + " tempVal " + tempVal + " active " + activeVal);
-      const needActivation = thresholdVal > tempVal;
+      const needActivation = getActiveState(activeVal, tempVal, thresholdVal);
       if (activeVal != needActivation) {
         if (activeVal && !needActivation) {
           console.log("checkActivation: needs deactivation");

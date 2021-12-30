@@ -92,8 +92,8 @@
         firebase.database().ref(temperaturePath).on('value', snapshot => {
           document.querySelector('#temperature').textContent = snapshot.val()
         });
-        document.querySelector('#increasetemperature').onclick = function () { addVal(temperaturePath, 0.5); };
-        document.querySelector('#decreasetemperature').onclick = function () { addVal(temperaturePath, -0.5); };
+        document.querySelector('#increasetemperature').onclick = function () { addVal(temperaturePath, 0.2); };
+        document.querySelector('#decreasetemperature').onclick = function () { addVal(temperaturePath, -0.2); };
 
         try {
           let app = firebase.app();
