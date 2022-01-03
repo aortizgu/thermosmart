@@ -434,7 +434,7 @@
       $.getJSON("https://api.openweathermap.org/data/2.5/weather?lat=40.295932644448435&lon=-3.8262439145919807&appid=" + config.OPENWEATHER_API_KEY + "&units=metric", function (json) {
         if (json) {
           $("#temp-ext-text").html(json["main"]["temp"].toFixed(1) + "º")
-          $("#temp-ext-image").attr("source", "http://openweathermap.org/img/w/" + json["weather"][0]["icon"] + ".png")
+          $("#temp-ext-image").attr("source", "https://openweathermap.org/img/w/" + json["weather"][0]["icon"] + ".png")
         }
       });
     }
