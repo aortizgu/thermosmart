@@ -1,6 +1,6 @@
-from firebase import firebase
 import glob
 import time
+import requests
 
 base_dir = '/sys/bus/w1/devices/'
 device_folder = glob.glob(base_dir + '28*')[0]
@@ -11,7 +11,7 @@ def read_temp_raw():
     lines = f.readlines()
     f.close()
     return lines
- 
+
 def read_temp():
     lines = read_temp_raw()
     while lines[0].strip()[-3:] != 'YES':
@@ -23,5 +23,27 @@ def read_temp():
         temp_c = float(temp_string) / 1000.0
         return temp_c
 
-firebase = firebase.FirebaseApplication('URL', None)
-firebase.put('/root/devices/casa_laura_adrian/status', 'temperature', read_temp())
+# login and fetch token
+user = ""
+password = ""
+login_payload = {
+        "email": user,
+        "password": password,
+        "returnSecureToken": True
+}
+login_params = {
+    "key": "AIzaSyCCNhYVqbU_9YAZpe5y2OKzXWdkPIHBorM"
+}
+login_reply = requests.post("https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword", params=login_params, data=login_payload)
+login_reply_json = login_reply.json()
+token = login_reply_json["idToken"]
+
+# update temp
+temp = read_temp()
+update_temp_payload = {
+  "temperature": temp
+}
+update_temp_params = {
+    "auth": token
+}
+requests.patch('https://thermosmart-b5382-default-rtdb.europe-west1.firebasedatabase.app/root/devices/casa_laura_adrian/status.json', params=update_temp_params, json=update_temp_payload)
