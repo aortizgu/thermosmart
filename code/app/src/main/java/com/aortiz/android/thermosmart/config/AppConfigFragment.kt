@@ -20,7 +20,7 @@ class AppConfigFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         Timber.i("onCreateView")
         binding =
             DataBindingUtil.inflate(
@@ -28,7 +28,6 @@ class AppConfigFragment : Fragment() {
                 R.layout.app_config_fragment, container, false
             )
         binding.viewModel = viewModel
-        setHasOptionsMenu(true)
         return binding.root
     }
 

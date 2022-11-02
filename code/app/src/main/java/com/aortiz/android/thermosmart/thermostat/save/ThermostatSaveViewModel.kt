@@ -5,7 +5,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.aortiz.android.thermosmart.repository.ThermostatRepository
-import com.aortiz.android.thermosmart.utils.ERROR_CODE
+import com.aortiz.android.thermosmart.utils.ERROR
 import com.aortiz.android.thermosmart.utils.OperationResult
 import timber.log.Timber
 
@@ -21,8 +21,8 @@ class ThermostatSaveViewModel(app: Application, private val repository: Thermost
         get() = _followState
 
 
-    private val _errorCode = MutableLiveData<ERROR_CODE?>(null)
-    val errorCode: LiveData<ERROR_CODE?>
+    private val _errorCode = MutableLiveData<ERROR?>(null)
+    val errorCode: LiveData<ERROR?>
         get() = _errorCode
 
     fun followThermostat(id: String) {

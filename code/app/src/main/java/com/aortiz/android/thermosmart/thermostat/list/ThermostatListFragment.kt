@@ -3,12 +3,16 @@ package com.aortiz.android.thermosmart.thermostat.list
 import android.content.Intent
 import android.os.Bundle
 import android.view.*
+import androidx.core.view.MenuHost
+import androidx.core.view.MenuProvider
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
 import androidx.navigation.fragment.findNavController
 import com.aortiz.android.thermosmart.R
 import com.aortiz.android.thermosmart.authentication.AuthenticationActivity
 import com.aortiz.android.thermosmart.databinding.ThermostatListFragmentBinding
+import com.aortiz.android.thermosmart.thermostat.detail.ThermostatDetailFragmentDirections
 import com.aortiz.android.thermosmart.utils.setDisplayHomeAsUpEnabled
 import com.firebase.ui.auth.AuthUI
 import com.google.firebase.auth.ktx.auth
@@ -26,7 +30,6 @@ class ThermostatListFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         Timber.i("onCreateView")
-        setHasOptionsMenu(true)
         setDisplayHomeAsUpEnabled(false)
         binding =
             DataBindingUtil.inflate(
@@ -50,30 +53,32 @@ class ThermostatListFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         Timber.i("onViewCreated")
         binding.lifecycleOwner = viewLifecycleOwner
+        val menuHost: MenuHost = requireActivity()
+        menuHost.addMenuProvider(object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                menuInflater.inflate(R.menu.menu_main, menu)
+            }
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                return when (menuItem.itemId) {
+                    R.id.action_logout -> {
+                        AuthUI.getInstance().signOut(requireContext()).addOnCompleteListener {
+                            Firebase.auth.signOut()
+                            val intent = Intent(requireContext(), AuthenticationActivity::class.java)
+                            startActivity(intent)
+                            requireActivity().finish()
+                        }
+                        true
+                    }
+                    R.id.action_settings -> {
+                        findNavController().navigate(ThermostatListFragmentDirections.actionThermostatListFragmentToAppConfigFragment())
+                        true
+                    }
+                    else -> false
+                }
+            }
+        }, viewLifecycleOwner, Lifecycle.State.RESUMED)
         binding.addThermostatButton.setOnClickListener {
             findNavController().navigate(ThermostatListFragmentDirections.actionThermostatListFragmentToThermostatSaveFragment())
         }
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.action_logout -> {
-                AuthUI.getInstance().signOut(requireContext()).addOnCompleteListener {
-                    Firebase.auth.signOut()
-                    val intent = Intent(requireContext(), AuthenticationActivity::class.java)
-                    startActivity(intent)
-                    requireActivity().finish()
-                }
-            }
-            R.id.action_settings -> {
-                findNavController().navigate(ThermostatListFragmentDirections.actionThermostatListFragmentToAppConfigFragment())
-            }
-        }
-        return super.onOptionsItemSelected(item)
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        super.onCreateOptionsMenu(menu, inflater)
-        inflater.inflate(R.menu.menu_main, menu)
     }
 }

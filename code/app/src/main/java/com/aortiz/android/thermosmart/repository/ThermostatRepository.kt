@@ -39,10 +39,10 @@ class ThermostatRepository(
 
     private suspend fun loadWeather(lat: Double, lon: Double) {
         withContext(Dispatchers.Default) {
-            val data = Network.openWeather.getWheater(lat, lon, openweatherApiKey).await()
+            val data = Network.openWeather.getWeatherAsync(lat, lon, openweatherApiKey).await()
             _cityName.postValue(data.name)
             _exteriorTemp.postValue(data.main.temp.toDouble())
-            if (!data.weather.isNullOrEmpty()) {
+            if (data.weather.isNotEmpty()) {
                 val imageUrl = Network.getImageUrl(data.weather.first().icon)
                 _exteriorImage.postValue(imageUrl)
             }

@@ -15,10 +15,10 @@ import org.koin.core.parameter.parametersOf
 class DetailNotificationActivity : AppCompatActivity() {
 
     companion object {
-        private const val EXTRA_thermostat = "EXTRA_thermostat"
-        fun newIntent(context: Context, thermostat: Thermostat): Intent {
+        private const val EXTRA_THERMOSTAT_ID = "EXTRA_THERMOSTAT_ID"
+        fun newIntent(context: Context, thermostatId: String): Intent {
             val intent = Intent(context, DetailNotificationActivity::class.java)
-            intent.putExtra(EXTRA_thermostat, thermostat)
+            intent.putExtra(EXTRA_THERMOSTAT_ID, thermostatId)
             return intent
         }
     }
@@ -33,8 +33,9 @@ class DetailNotificationActivity : AppCompatActivity() {
             this,
             R.layout.activity_detail_notification
         )
-        val thermostat = intent.extras?.get(EXTRA_thermostat) as Thermostat
-        thermostatId = thermostat.id!!
+        intent.extras?.let { bundle ->
+            thermostatId = bundle.getString(EXTRA_THERMOSTAT_ID, "")
+        }
         binding.viewModel = viewModel
         binding.lifecycleOwner = this
     }

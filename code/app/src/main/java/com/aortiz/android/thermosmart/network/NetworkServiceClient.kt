@@ -20,7 +20,7 @@ interface ApiOpenWeatherService {
     }
 
     @GET(WEATHER)
-    fun getWheater(
+    fun getWeatherAsync(
         @Query("lat") lat: Double,
         @Query("lon") lon: Double,
         @Query("appid") apiKey: String,

@@ -2,8 +2,11 @@ package com.aortiz.android.thermosmart.thermostat.detail
 
 import android.os.Bundle
 import android.view.*
+import androidx.core.view.MenuHost
+import androidx.core.view.MenuProvider
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
 import androidx.navigation.fragment.findNavController
 import com.aortiz.android.thermosmart.R
 import com.aortiz.android.thermosmart.databinding.ThermostatDetailFragmentBinding
@@ -23,7 +26,6 @@ class ThermostatDetailFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         Timber.i("onCreateView")
-        setHasOptionsMenu(true)
         setDisplayHomeAsUpEnabled(true)
         thermostatId = ThermostatDetailFragmentArgs.fromBundle(requireArguments()).thermostatId
         binding =
@@ -32,11 +34,11 @@ class ThermostatDetailFragment : Fragment() {
                 R.layout.thermostat_detail_fragment, container, false
             )
         binding.viewModel = viewModel
-        viewModel.thermostat.observe(viewLifecycleOwner, { thermostat ->
+        viewModel.thermostat.observe(viewLifecycleOwner) { thermostat ->
             if (thermostat.latitude != null && thermostat.longitude != null) {
                 viewModel.loadWeatherData(thermostat.latitude!!, thermostat.longitude!!)
             }
-        })
+        }
         return binding.root
     }
 
@@ -44,26 +46,27 @@ class ThermostatDetailFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         Timber.i("onViewCreated")
         binding.lifecycleOwner = viewLifecycleOwner
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when (item.itemId) {
-            R.id.action_config -> {
-                viewModel.thermostat.value?.let {
-                    findNavController().navigate(
-                        ThermostatDetailFragmentDirections.actionThermostatDetailFragmentToThermostatConfigFragment(
-                            it
-                        )
-                    )
+        val menuHost: MenuHost = requireActivity()
+        menuHost.addMenuProvider(object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                menuInflater.inflate(R.menu.menu_detail, menu)
+            }
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                return when (menuItem.itemId) {
+                    R.id.action_config -> {
+                        viewModel.thermostat.value?.let {
+                            findNavController().navigate(
+                                ThermostatDetailFragmentDirections.actionThermostatDetailFragmentToThermostatConfigFragment(
+                                    it
+                                )
+                            )
+                        }
+                        true
+                    }
+                    else -> false
                 }
             }
-        }
-        return super.onOptionsItemSelected(item)
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        super.onCreateOptionsMenu(menu, inflater)
-        inflater.inflate(R.menu.menu_detail, menu)
+        }, viewLifecycleOwner, Lifecycle.State.RESUMED)
     }
 
     override fun onDestroy() {

@@ -7,7 +7,7 @@ import com.aortiz.android.thermosmart.R
 import com.aortiz.android.thermosmart.database.DBSnapShot
 import com.aortiz.android.thermosmart.database.DBThermostat
 import com.aortiz.android.thermosmart.database.DBThermostatConfiguration
-import com.aortiz.android.thermosmart.utils.ERROR_CODE
+import com.aortiz.android.thermosmart.utils.ERROR
 import com.aortiz.android.thermosmart.utils.OperationResult
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.FirebaseDatabase
@@ -129,7 +129,7 @@ class RTDatabase(context: Context) {
             val reference =
                 database.getReference("$ROOT_REFERENCE/$DEVICES_REFERENCE")
             reference.get()
-                .addOnSuccessListener { dataSnapshot ->
+                .addOnSuccessListener addOnSuccessListener1@ { dataSnapshot ->
                     if (dataSnapshot.hasChild(id)) {
                         var devicesList = dataSnapshot.child(id).child(CONFIG_REFERENCE)
                             .child(FOLLOWERS_REFERENCE).getValue<ArrayList<String>>() ?: ArrayList()
@@ -145,7 +145,7 @@ class RTDatabase(context: Context) {
                                     cb(
                                         OperationResult.Error(
                                             Exception("Error $it"),
-                                            ERROR_CODE.UNKNOWN
+                                            ERROR.UNKNOWN
                                         )
                                     )
                                     return@addOnFailureListener
@@ -155,29 +155,29 @@ class RTDatabase(context: Context) {
                             cb(
                                 OperationResult.Error(
                                     Exception("Already Following"),
-                                    ERROR_CODE.ALREADY_FOLLOWING
+                                    ERROR.ALREADY_FOLLOWING
                                 )
                             )
-                            return@addOnSuccessListener
+                            return@addOnSuccessListener1
                         }
                     } else {
                         Timber.e("followThermostat: Invalid device")
                         cb(
                             OperationResult.Error(
                                 Exception("Invalid Device"),
-                                ERROR_CODE.INVALID_DEVICE
+                                ERROR.INVALID_DEVICE
                             )
                         )
-                        return@addOnSuccessListener
+                        return@addOnSuccessListener1
                     }
                 }.addOnFailureListener {
                     Timber.e("Error getting data $it")
-                    cb(OperationResult.Error(Exception("Error $it"), ERROR_CODE.UNKNOWN))
+                    cb(OperationResult.Error(Exception("Error $it"), ERROR.UNKNOWN))
                     return@addOnFailureListener
                 }
         } else {
             Timber.d("fetchThermostats: cannot get user")
-            cb(OperationResult.Error(Exception("Error getting user"), ERROR_CODE.INVALID_USER))
+            cb(OperationResult.Error(Exception("Error getting user"), ERROR.INVALID_USER))
         }
     }
 
@@ -188,7 +188,7 @@ class RTDatabase(context: Context) {
             val reference =
                 database.getReference("$ROOT_REFERENCE/$DEVICES_REFERENCE/$id/$CONFIG_REFERENCE/$FOLLOWERS_REFERENCE")
             reference.get()
-                .addOnSuccessListener { dataSnapshot ->
+                .addOnSuccessListener addOnSuccessListener1@ { dataSnapshot ->
                     var devicesList = dataSnapshot.getValue<ArrayList<String>>() ?: ArrayList()
                     if (devicesList.contains(userId)) {
                         devicesList.remove(userId)
@@ -202,7 +202,7 @@ class RTDatabase(context: Context) {
                                 cb(
                                     OperationResult.Error(
                                         Exception("Error $it"),
-                                        ERROR_CODE.UNKNOWN
+                                        ERROR.UNKNOWN
                                     )
                                 )
                                 return@addOnFailureListener
@@ -212,19 +212,19 @@ class RTDatabase(context: Context) {
                         cb(
                             OperationResult.Error(
                                 Exception("Not Following device"),
-                                ERROR_CODE.NOT_FOLLOWING
+                                ERROR.NOT_FOLLOWING
                             )
                         )
-                        return@addOnSuccessListener
+                        return@addOnSuccessListener1
                     }
                 }.addOnFailureListener {
                     Timber.e("Error getting data $it")
-                    cb(OperationResult.Error(Exception("Error $it"), ERROR_CODE.UNKNOWN))
+                    cb(OperationResult.Error(Exception("Error $it"), ERROR.UNKNOWN))
                     return@addOnFailureListener
                 }
         } else {
             Timber.d("fetchThermostats: cannot get user")
-            cb(OperationResult.Error(Exception("Error getting user"), ERROR_CODE.INVALID_USER))
+            cb(OperationResult.Error(Exception("Error getting user"), ERROR.INVALID_USER))
         }
     }
 

@@ -8,9 +8,13 @@ import android.location.Location
 import android.os.Bundle
 import android.view.*
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
+import androidx.core.view.MenuHost
+import androidx.core.view.MenuProvider
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
 import androidx.navigation.fragment.findNavController
 import com.aortiz.android.thermosmart.R
 import com.aortiz.android.thermosmart.databinding.SelectLocationFragmentBinding
@@ -36,12 +40,26 @@ class SelectLocationFragment : OnMapReadyCallback, Fragment() {
     private val viewModel: ThermostatConfigViewModel by inject()
     private lateinit var map: GoogleMap
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
-    private val REQUEST_LOCATION_PERMISSION = 1
     private var marker: Marker? = null
     private var lastKnownLocation: Location? = null
     private val defaultLocation = LatLng(-33.8523341, 151.2106085)
     private var selectedLatLng: LatLng? = null
     private var selectedLocation: String? = null
+    private val requestMultiplePermissions = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        if (permissions.values.any { it }) {
+            Timber.d("requestMultiplePermissions: granted, try to enable my location")
+            enableMyLocation()
+        } else {
+            Toast.makeText(
+                context,
+                getString(R.string.permission_denied_explanation),
+                Toast.LENGTH_SHORT
+            ).show()
+            Timber.d("requestMultiplePermissions: not granted")
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
@@ -54,7 +72,6 @@ class SelectLocationFragment : OnMapReadyCallback, Fragment() {
         binding.selectLocationButtonSave.setOnClickListener {
             onLocationSelected()
         }
-        setHasOptionsMenu(true)
         setDisplayHomeAsUpEnabled(true)
         fusedLocationProviderClient =
             LocationServices.getFusedLocationProviderClient(requireActivity())
@@ -63,6 +80,35 @@ class SelectLocationFragment : OnMapReadyCallback, Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val menuHost: MenuHost = requireActivity()
+        menuHost.addMenuProvider(object : MenuProvider {
+            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
+                menuInflater.inflate(R.menu.map_options, menu)
+            }
+
+            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
+                return when (menuItem.itemId) {
+                    R.id.normal_map -> {
+                        map.mapType = GoogleMap.MAP_TYPE_NORMAL
+                        true
+                    }
+                    R.id.hybrid_map -> {
+                        map.mapType = GoogleMap.MAP_TYPE_HYBRID
+                        true
+                    }
+                    R.id.satellite_map -> {
+                        map.mapType = GoogleMap.MAP_TYPE_SATELLITE
+                        true
+                    }
+                    R.id.terrain_map -> {
+                        map.mapType = GoogleMap.MAP_TYPE_TERRAIN
+                        true
+                    }
+                    else -> false
+                }
+            }
+        }, viewLifecycleOwner, Lifecycle.State.RESUMED)
+
         val mapFragment =
             childFragmentManager.findFragmentById(R.id.selectLocationMapFragment) as SupportMapFragment
         mapFragment.getMapAsync(this)
@@ -75,33 +121,9 @@ class SelectLocationFragment : OnMapReadyCallback, Fragment() {
         findNavController().popBackStack()
     }
 
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.map_options, menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
-        R.id.normal_map -> {
-            map.mapType = GoogleMap.MAP_TYPE_NORMAL
-            true
-        }
-        R.id.hybrid_map -> {
-            map.mapType = GoogleMap.MAP_TYPE_HYBRID
-            true
-        }
-        R.id.satellite_map -> {
-            map.mapType = GoogleMap.MAP_TYPE_SATELLITE
-            true
-        }
-        R.id.terrain_map -> {
-            map.mapType = GoogleMap.MAP_TYPE_TERRAIN
-            true
-        }
-        else -> super.onOptionsItemSelected(item)
-    }
-
-    override fun onMapReady(googleMap: GoogleMap?) {
+    override fun onMapReady(googleMap: GoogleMap) {
         Timber.d("onMapReady")
-        map = googleMap!!
+        map = googleMap
         setMapOnClick()
         enableMyLocation()
     }
@@ -109,10 +131,9 @@ class SelectLocationFragment : OnMapReadyCallback, Fragment() {
     private fun isPermissionGranted(): Boolean {
         return ContextCompat.checkSelfPermission(
             requireActivity(),
-            Manifest.permission.ACCESS_FINE_LOCATION
-        ) === PackageManager.PERMISSION_GRANTED
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        ) == PackageManager.PERMISSION_GRANTED
     }
-
 
     @SuppressLint("MissingPermission")
     private fun enableMyLocation() {
@@ -128,7 +149,7 @@ class SelectLocationFragment : OnMapReadyCallback, Fragment() {
                     viewModel.latitude.value ?: defaultLocation.latitude,
                     viewModel.longitude.value ?: defaultLocation.longitude,
                 )
-                map?.moveCamera(
+                map.moveCamera(
                     CameraUpdateFactory.newLatLngZoom(
                         latLng, 15f
                     )
@@ -139,34 +160,12 @@ class SelectLocationFragment : OnMapReadyCallback, Fragment() {
             }
         } else {
             Timber.d("enableMyLocation: permission not granted")
-            requestPermissions(
-                arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
-                REQUEST_LOCATION_PERMISSION
+            requestMultiplePermissions.launch(
+                arrayOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                )
             )
-        }
-    }
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        Timber.d("onRequestPermissionsResult: requestCode? $requestCode permissions? $permissions grantResults? $grantResults")
-        if (requestCode == REQUEST_LOCATION_PERMISSION) {
-            if (grantResults.isNotEmpty() && (grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                Timber.d("onRequestPermissionsResult: granted, try to enable my location")
-                enableMyLocation()
-            } else {
-                Toast.makeText(
-                    context,
-                    getString(R.string.permission_denied_explanation),
-                    Toast.LENGTH_SHORT
-                ).show()
-                Timber.d("onRequestPermissionsResult: not granted")
-            }
-        } else {
-            Timber.d("onRequestPermissionsResult: not managed code")
         }
     }
 
@@ -179,7 +178,7 @@ class SelectLocationFragment : OnMapReadyCallback, Fragment() {
                     Timber.d("getDeviceLocation: Task Successful, move map to current location")
                     lastKnownLocation = task.result
                     if (lastKnownLocation != null) {
-                        map?.moveCamera(
+                        map.moveCamera(
                             CameraUpdateFactory.newLatLngZoom(
                                 LatLng(
                                     lastKnownLocation!!.latitude,
@@ -191,11 +190,11 @@ class SelectLocationFragment : OnMapReadyCallback, Fragment() {
                 } else {
                     Timber.d("getDeviceLocation: Current location is null. Using defaults.")
                     Timber.e("Exception: %s", task.exception)
-                    map?.moveCamera(
+                    map.moveCamera(
                         CameraUpdateFactory
                             .newLatLngZoom(defaultLocation, 15f)
                     )
-                    map?.uiSettings?.isMyLocationButtonEnabled = false
+                    map.uiSettings.isMyLocationButtonEnabled = false
                 }
             }
         } catch (e: SecurityException) {

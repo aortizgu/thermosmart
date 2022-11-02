@@ -2,6 +2,8 @@ package com.aortiz.android.thermosmart
 
 import android.app.Application
 import android.content.pm.PackageManager
+import android.os.Build
+import androidx.annotation.RequiresApi
 import com.aortiz.android.thermosmart.authentication.AuthenticationViewModel
 import com.aortiz.android.thermosmart.config.AppConfigViewModel
 import com.aortiz.android.thermosmart.database.local.SharedPreferencesDatabase
@@ -19,20 +21,10 @@ import timber.log.Timber
 
 class MyApp : Application() {
 
+    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override fun onCreate() {
         super.onCreate()
         Timber.plant(Timber.DebugTree())
-        var openweatherApiKey: String = ""
-        try {
-            val ai = packageManager.getApplicationInfo(
-                this.packageName,
-                PackageManager.GET_META_DATA
-            )
-            val bundle = ai.metaData
-            openweatherApiKey = bundle.getString("openweather.API_KEY")!!
-        } catch (e: Exception) {
-            Timber.e("Don't forget to configure <meta-data android:name=\"openweather.API_KEY\" android:value=\"testValue\"/> in your AndroidManifest.xml file.")
-        }
 
         val myModule = module {
             viewModel {
@@ -62,7 +54,7 @@ class MyApp : Application() {
                 ThermostatDetailViewModel(
                     get(),
                     get(),
-                    parameters.get<String>() as String
+                    parameters.get()
                 )
             }
             single {
@@ -73,7 +65,7 @@ class MyApp : Application() {
             }
 
             single { SharedPreferencesDatabase(get()) }
-            single { ThermostatRepository(get(), get(), openweatherApiKey) }
+            single { ThermostatRepository(get(), get(), BuildConfig.OPEN_WEATHER_API_KEY) }
             single { RTDatabase(get()) }
         }
 

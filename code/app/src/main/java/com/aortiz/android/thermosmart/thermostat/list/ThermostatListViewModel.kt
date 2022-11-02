@@ -21,6 +21,7 @@ class ThermostatListViewModel(app: Application, repository: ThermostatRepository
             refreshToken {
                 when (it) {
                     is OperationResult.Success -> repository.updateDeviceToken(it.data)
+                    else -> {}
                 }
             }
         }

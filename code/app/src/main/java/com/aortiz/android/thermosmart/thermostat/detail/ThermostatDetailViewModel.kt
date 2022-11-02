@@ -11,7 +11,7 @@ import kotlinx.coroutines.launch
 
 class ThermostatDetailViewModel(
     app: Application,
-    val repository: ThermostatRepository,
+    private val repository: ThermostatRepository,
     thermostatId: String
 ) : AndroidViewModel(app) {
 

@@ -11,8 +11,8 @@ import com.aortiz.android.thermosmart.domain.Thermostat
 import com.aortiz.android.thermosmart.repository.ThermostatRepository
 import com.aortiz.android.thermosmart.thermostat.list.ThermostatAdapter
 import com.squareup.picasso.Picasso
-import org.koin.core.KoinComponent
-import org.koin.core.inject
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
 object BindingAdapters {
 
