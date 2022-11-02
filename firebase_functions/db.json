@@ -3,56 +3,46 @@
         "devices": {
             "dev1": {
                 "configuration": {
+                    "boiler": {
+                        "threshold": 25
+                    },
                     "followers": [
-                        "usertestuuid2",
-                        "BkYqhvhCuka4ImcL9nouSJmNtJA2",
-                        "gjPSF3kyJDVhA35sIA0HB0PXYGV2"
+                        "lpTnXSx1EnaqnmSnoqOUp5qMeLB2"
                     ],
                     "lat": 37.427451733780586,
                     "location": "Lat: 37.42745, Long: -122.08050",
                     "lon": -122.08050157874823,
                     "name": "Dev1",
-                    "threshold": 24.5
+                    "watering": {
+                        "activationHour": 8,
+                        "automaticWateringEnabled": true,
+                        "durationMinute": 1,
+                        "frecuencyDay": 1
+                    }
                 },
                 "id": "dev1",
                 "status": {
-                    "active": true,
-                    "temperature": 24
-                }
-            },
-            "dev2": {
-                "configuration": {
-                    "followers": [
-                        "usertestuuid2",
-                        "BkYqhvhCuka4ImcL9nouSJmNtJA2",
-                        "oDGTpyP6AEZVf4YgFSyD1fbEPiw1",
-                        "gjPSF3kyJDVhA35sIA0HB0PXYGV2"
-                    ],
-                    "lat": 37.427451733780586,
-                    "location": "Lat: 37.42745, Long: -122.08050",
-                    "lon": -122.08050157874823,
-                    "name": "My test devicetestuuid2",
-                    "threshold": 26.2
-                },
-                "id": "dev2",
-                "status": {
-                    "active": true,
-                    "temperature": 21
+                    "esp8266": {
+                        "boilerState": false,
+                        "heartbeat": 1667431389,
+                        "num": 11459,
+                        "period": 60,
+                        "wateringState": false
+                    },
+                    "lastWateringActivation": 1667431271,
+                    "nextWateringActivation": 1,
+                    "outputs": {
+                        "boiler": true,
+                        "watering": false
+                    },
+                    "temperature": 24.2
                 }
             }
         },
         "users": {
-            "BkYqhvhCuka4ImcL9nouSJmNtJA2": {
-                "id": "BkYqhvhCuka4ImcL9nouSJmNtJA2",
-                "token": "fb856smqSXC0jhD5M_MtjX:APA91bGqZ4qqGw5gF70M45hVLMZYlRa_D-xx2VkT1JtCreLNA81k84Qp2zi41kgaOcrogqDXNh8W9dqzgDelfVthC3bLffhj7cxrBstNTT0V831zdIlmjzZhF849KhejdSfSNSeoXbvS"
-            },
-            "gjPSF3kyJDVhA35sIA0HB0PXYGV2": {
-                "id": "gjPSF3kyJDVhA35sIA0HB0PXYGV2",
-                "token": "cnYbiNf-R4CQF2y4-9eVTJ:APA91bEKU1fkZhkDoIQY0YCNHcW-nCSmCOsUB6NhLICAct356O4HVsp6tBC1Hi3xT8Op8SUaE30WYYksTubttaNd7jlTGFNKOuMBOiimub1TNRwoPdFzB6ZVjGL1D8yEp8LjO-jeWyRj"
-            },
-            "oDGTpyP6AEZVf4YgFSyD1fbEPiw1": {
-                "id": "oDGTpyP6AEZVf4YgFSyD1fbEPiw1",
-                "token": "cnYbiNf-R4CQF2y4-9eVTJ:APA91bEKU1fkZhkDoIQY0YCNHcW-nCSmCOsUB6NhLICAct356O4HVsp6tBC1Hi3xT8Op8SUaE30WYYksTubttaNd7jlTGFNKOuMBOiimub1TNRwoPdFzB6ZVjGL1D8yEp8LjO-jeWyRj"
+            "lpTnXSx1EnaqnmSnoqOUp5qMeLB2": {
+                "id": "lpTnXSx1EnaqnmSnoqOUp5qMeLB2",
+                "token": "fzxLCEROSKGe_B2U2kxVRK:APA91bFPWTlDcTru8RBKM1g-3Co6Om4HZnGRvoOFg-dGC8gKxSEJGc_QmtlzSc6m7EOq-2EfqDO2SkejjeiuPpy4B93XvnwMZFVf2DgkUYY6poV_zGcePJhi2MbEMkopg3LxDWm8k19t"
             }
         }
     }

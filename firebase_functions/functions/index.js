@@ -1,174 +1,326 @@
 /* eslint-disable require-jsdoc */
 const functions = require("firebase-functions");
 const admin = require("firebase-admin");
+const logger = require("firebase-functions/logger");
 
-function getActiveState(activeNow, tempVal, thresholdVal) {
-  let mustActivate = false;
-  const hysteresis = 0.50;
-  if (activeNow) {
-    mustActivate = tempVal < (thresholdVal + hysteresis);
-  } else {
-    mustActivate = tempVal < (thresholdVal - hysteresis);
+async function getVal(app, ref) {
+
+  var val = undefined;
+
+  await app.database().ref(ref).get().then((snapshot) => {
+    val = snapshot.val();
+  }).catch((err) => {
+    logger.error("getVal: error", err);
+  });
+
+  return val;
+
+}
+
+async function sendNotification(app, payload, user) {
+
+  logger.info("sendNotification: payload", payload, ", user", user);
+
+  const tokenRef = "/root/users/" + user + "/token";
+  const token = await getVal(app, tokenRef);
+  if (token == undefined || !token) {
+    logger.error("sendNotification: invalid token", token);
+    return;
   }
-  return mustActivate;
-}
 
-function checkActivation(app, activeRef, tempVal, thresholdVal) {
-  return new Promise((resolve) => {
-    app.database().ref(activeRef).get().then((value) => {
-      const activeVal = value.val();
-      console.log("checkActivation: thresholdVal " + thresholdVal + " tempVal " + tempVal + " active " + activeVal);
-      const needActivation = getActiveState(activeVal, tempVal, thresholdVal);
-      if (activeVal != needActivation) {
-        if (activeVal && !needActivation) {
-          console.log("checkActivation: needs deactivation");
-        } else if (!activeVal && needActivation) {
-          console.log("checkActivation: needs activation");
+  var tokenError = undefined;
+  await app.messaging().sendToDevice(token, payload)
+    .then((response) => {
+      response.results.forEach((result, index) => {
+        const error = result.error;
+        if (error) {
+          logger.error("sendNotification: Failure sending notification to", token, error);
+          // Cleanup the tokens who are not registered anymore.
+          if (error.code === "messaging/invalid-registration-token" ||
+            error.code === "messaging/registration-token-not-registered") {
+            tokenError = true;
+          }
         }
-        return app.database().ref(activeRef).set(needActivation).then((res) => {
-          console.log("checkActivation: done");
-          return resolve();
-        }).catch((err) => {
-          console.log("checkActivation: " + err);
-          return resolve().then(() => Promise.reject(err));
-        });
-      } else {
-        console.log("checkActivation: no change needed");
-        return resolve();
-      }
+      });
     }).catch((err) => {
-      console.log("checkActivation: " + err);
-      return resolve().then(() => Promise.reject(err));
+      logger.error("sendNotification: error when sending notification to ", token, " error ", err);
     });
-  });
+
+  if (tokenError != undefined && tokenError) {
+    logger.error("sendNotification: invalid token", token);
+    await app.database().ref(tokenRef).remove().then(() => {
+      logger.info("sendNotification: deleted token", token);
+    }).catch((err) => {
+      logger.error("sendNotification: error deleting token", err);
+    });
+  }
+
 }
 
-exports.ondevicethreshold = functions.database.ref("/root/devices/{devId}/configuration/threshold")
-  .onUpdate((snap, context) => {
-    console.log("ondevicethreshold: change in device ", context.params.devId, " threshold from ", snap.before.val(), "to", snap.after.val());
-    const thresholdVal = snap.after.val();
-    const appOptions = JSON.parse(process.env.FIREBASE_CONFIG);
-    appOptions.databaseAuthVariableOverride = context.auth;
-    const app = admin.initializeApp(appOptions, "app");
-    const deleteApp = () => app.delete().catch(() => null);
-    const temperatureRef = snap.after.ref.parent.parent.child("status").child("temperature");
-    const activeRef = snap.after.ref.parent.parent.child("status").child("active");
-    return app.database().ref(temperatureRef).get().then((value) => {
-      const tempVal = value.val();
-      console.log("ondevicethreshold: thresholdVal " + thresholdVal + " tempVal " + tempVal);
-      return checkActivation(app, activeRef, tempVal, thresholdVal).then(() => {
-        console.log("ondevicethreshold: done");
-        return deleteApp();
-      });
+async function onActivationChange(app, payload, devId) {
+
+  const followers = await getVal(app, "/root/devices/" + devId + "/configuration/followers");
+  if (followers == undefined) {
+    logger.error("onActivationChange: invalid followersRef", followers);
+    return;
+  }
+
+  for (let index = 0; index < followers.length; index++) {
+    const folower = followers[index]
+    await sendNotification(app, payload, folower);
+  }
+
+}
+
+async function checkBoilerActivation(app, devId, tempVal, thresholdVal) {
+
+  const activeRef = "/root/devices/" + devId + "/status/outputs/boiler";
+  const activeVal = await getVal(app, activeRef);
+  if (activeVal == undefined) {
+    logger.error("checkBoilerActivation: invalid activeVal", activeVal);
+    return;
+  }
+
+  let needActivation = false;
+  const hysteresis = 0.50;
+  if (activeVal) {
+    needActivation = tempVal < (thresholdVal + hysteresis);
+  } else {
+    needActivation = tempVal < (thresholdVal - hysteresis);
+  }
+
+  logger.debug("checkBoilerActivation: thresholdVal", thresholdVal
+    , ", tempVal", tempVal
+    , ", active", activeVal
+    , ", needActivation", needActivation);
+
+  if (activeVal != needActivation) {
+    if (activeVal && !needActivation) {
+      logger.info("checkBoilerActivation: needs deactivation");
+    } else if (!activeVal && needActivation) {
+      logger.info("checkBoilerActivation: needs activation");
+    }
+    await app.database().ref(activeRef).set(needActivation).then(() => {
+      logger.info("checkWateringActivation: done");
     }).catch((err) => {
-      console.log("ondevicethreshold: " + err);
-      return deleteApp().then(() => Promise.reject(err));
+      logger.error("checkWateringActivation: error", err);
     });
+  } else {
+    logger.info("checkBoilerActivation: no change needed");
+  }
+
+}
+
+async function checkAutomatedActivationNeeded(app, devId) {
+
+  const wateringConfigRef = "/root/devices/" + devId + "/configuration/watering";
+  const wateringConfig = await getVal(app, wateringConfigRef);
+  if (wateringConfig == undefined) {
+    logger.error("checkAutomatedActivationNeeded: invalid wateringConfig", wateringConfig);
+    return false;
+  }
+
+  if (wateringConfig.automaticWateringEnabled == false) {
+    logger.debug("checkAutomatedActivationNeeded: automated activation disabled");
+    return false;
+  }
+
+  const nextWateringActivationRef = "/root/devices/" + devId + "/status/nextWateringActivation";
+  const nextWateringActivation = await getVal(app, nextWateringActivationRef);
+  if (nextWateringActivation == undefined || isNaN(nextWateringActivation)) {
+    logger.error("checkAutomatedActivationNeeded: invalid nextWateringActivation", nextWateringActivation);
+    return false;
+  }
+
+  const epochNow = Math.round(Date.now() / 1000)
+  if (epochNow < nextWateringActivation) {
+    logger.debug("checkAutomatedActivationNeeded: automated activation does not need to be activated");
+    return false;
+  }
+
+  let nextDate = new Date()
+  nextDate.setDate(nextDate.getDate() + wateringConfig.frecuencyDay);
+  nextDate.setHours(wateringConfig.activationHour);
+  nextDate.setMinutes(0);
+  nextDate.setSeconds(0);
+  nextDate.setMilliseconds(0);
+  const nextEpochTime = Math.round(nextDate.getTime() / 1000);
+
+  await app.database().ref(nextWateringActivationRef).set(nextEpochTime).then(() => {
+    logger.info("onwateringdeviceactive: updated next activation time, ", nextEpochTime);
+  }).catch((err) => {
+    logger.error("onwateringdeviceactive: error", err);
   });
 
-exports.ondevicetemp = functions.database.ref("/root/devices/{devId}/status/temperature")
-  .onUpdate((snap, context) => {
-    console.log("ondevicetemp: change in device ", context.params.devId, " temperature from ", snap.before.val(), "to", snap.after.val());
-    const tempVal = snap.after.val();
-    const appOptions = JSON.parse(process.env.FIREBASE_CONFIG);
-    appOptions.databaseAuthVariableOverride = context.auth;
-    const app = admin.initializeApp(appOptions, "app");
-    const deleteApp = () => app.delete().catch(() => null);
-    const thresholdRef = snap.after.ref.parent.parent.child("configuration").child("threshold");
-    const activeRef = snap.after.ref.parent.child("active");
-    return app.database().ref(thresholdRef).get().then((value) => {
-      const thresholdVal = value.val();
-      console.log("ondevicetemp: thresholdVal " + thresholdVal + " tempVal " + tempVal);
-      return checkActivation(app, activeRef, tempVal, thresholdVal).then(() => {
-        console.log("ondevicetemp: done");
-        return deleteApp();
-      });
-    }).catch((err) => {
-      console.log("ondevicetemp: " + err);
-      return deleteApp().then(() => Promise.reject(err));
-    });
-  });
+  return true;
 
-exports.ondeviceactive = functions.database.ref("/root/devices/{devId}/status/active")
-  .onUpdate((snap, context) => {
-    console.log("change in device ", context.params.devId, " active from ", snap.before.val(), " to ", snap.after.val());
-    const appOptions = JSON.parse(process.env.FIREBASE_CONFIG);
-    appOptions.databaseAuthVariableOverride = context.auth;
-    const app = admin.initializeApp(appOptions, "app");
-    const deleteApp = () => app.delete().catch(() => null);
-    const deviceNameRef = snap.after.ref.parent.parent.child("configuration").child("name");
-    return app.database().ref(deviceNameRef).get().then((deviceNameSnapshot) => {
-      const deviceNameVal = deviceNameSnapshot.val();
-      const message = "Thermostat " + deviceNameVal + " has been " + (snap.after.val() ? "activated" : "deactivated");
-      const payload = {
-        data: {
-          title: snap.after.val() ? "Activated" : "Deactivated",
-          body: message,
-          thermostat: context.params.devId,
-        },
-      };
-      const folowersRef = snap.after.ref.parent.parent.child("configuration").child("followers");
-      return app.database().ref(folowersRef).get().then((folowersSnapshot) => {
-        console.log("ondeviceactive: iterate over device followers");
-        const folowersPromises = [];
-        folowersSnapshot.forEach((folowerSnapshot) => {
-          const followerVal = folowerSnapshot.val();
-          folowersPromises.push(new Promise((resolve) => {
-            console.log("ondeviceactive: iterate over follower " + followerVal + " devices");
-            app.database().ref("/root/users/" + followerVal + "/token").get().then((tokensSnapshot) => {
-              const token = tokensSnapshot.val();
-              if (token) {
-                console.log("ondeviceactive: sending notification to user " + followerVal + ", device token " + token);
-                app.messaging().sendToDevice(token, payload).then((response) => {
-                  const tokensToRemove = [];
-                  response.results.forEach((result, index) => {
-                    const error = result.error;
-                    if (error) {
-                      console.log("Failure sending notification to", token, error);
-                      // Cleanup the tokens who are not registered anymore.
-                      if (error.code === "messaging/invalid-registration-token" ||
-                        error.code === "messaging/registration-token-not-registered") {
-                        tokensToRemove.push(tokensSnapshot.ref.child(token).remove());
-                      }
-                    }
-                  });
-                  return Promise.all(tokensToRemove).then(() => {
-                    console.log("ondeviceactive: exit from tokens to remove " + tokensSnapshot.ref);
-                  }).catch((err) => {
-                    console.log("ondeviceactive: error when exit from tokens to remove " + tokensSnapshot.ref + " error " + err);
-                  });
-                }).then(() => {
-                  console.log("ondeviceactive: exit from " + tokensSnapshot.ref);
-                  return resolve();
-                }).catch((err) => {
-                  console.log("ondeviceactive: error when exit from " + tokensSnapshot.ref + " error " + err);
-                  return resolve();
-                });
-              } else {
-                console.log("ondeviceactive: invalid token from " + followerVal);
-                return resolve();
-              }
-            }).catch((err) => {
-              console.log("ondeviceactive: error " + err);
-              return resolve();
-            });
-          }));
-        });
-        return Promise.all(folowersPromises).then(() => {
-          console.log("ondeviceactive: exit from folowersPromises");
-        }).catch((err) => {
-          console.log("ondeviceactive: error when exit from folowersPromises error " + err);
-        });
-      }).then(() => {
-        console.log("ondeviceactive: exit from " + folowersRef);
+}
+
+async function checkWateringActivation(app, devId, lastWateringActivation) {
+
+  const activeRef = "/root/devices/" + devId + "/status/outputs/watering";
+  const activeVal = await getVal(app, activeRef);
+  if (activeVal == undefined) {
+    logger.error("checkWateringActivation: invalid activeVal", activeVal);
+    return;
+  }
+
+  const epochNow = Math.round(Date.now() / 1000)
+
+  const wateringConfigRef = "/root/devices/" + devId + "/configuration/watering";
+  const wateringConfig = await getVal(app, wateringConfigRef);
+  if (wateringConfig == undefined) {
+    logger.error("checkAutomatedActivationNeeded: invalid wateringConfig", wateringConfig);
+    return;
+  }
+
+  const automatedActivationNeeded = await checkAutomatedActivationNeeded(app, devId);
+  if (automatedActivationNeeded) {
+    logger.debug("checkWateringActivation: update lastWateringActivation to current epoch in order to trigger the activation");
+
+    const lastWateringActivationRef = "/root/devices/" + devId + "/status/lastWateringActivation";
+    await app.database().ref(lastWateringActivationRef).set(epochNow).then(() => {
+      logger.info("checkWateringActivation: updated lastWateringActivation", epochNow);
+    }).catch((err) => {
+      logger.error("checkWateringActivation: error setting lastWateringActivation", err);
+    });
+
+  } else {
+    const durationSeconds = wateringConfig.durationMinute * 60;
+    const timeSinceLastActivation = epochNow - lastWateringActivation;
+    const needActivation = timeSinceLastActivation < durationSeconds;
+
+    logger.debug("checkWateringActivation: needActivation", needActivation
+      , ", activeVal", activeVal
+      , ", epochNow", epochNow
+      , ", timeSinceLastActivation", timeSinceLastActivation
+      , ", durationSeconds", durationSeconds);
+
+    if (activeVal != needActivation) {
+      if (activeVal && !needActivation) {
+        logger.info("checkWateringActivation: needs deactivation");
+      } else if (!activeVal && needActivation) {
+        logger.info("checkWateringActivation: needs activation");
+      }
+      await app.database().ref(activeRef).set(needActivation).then(() => {
+        logger.info("checkWateringActivation: done");
       }).catch((err) => {
-        console.log("ondeviceactive: error" + err);
+        logger.error("checkWateringActivation: error", err);
       });
-    }).then(() => {
-      console.log("ondeviceactive: exit from " + deviceNameRef);
+    } else {
+      logger.info("checkWateringActivation: no change needed");
+    }
+  }
+}
+
+exports.onboilerthreshold = functions.database.ref("/root/devices/{devId}/configuration/boiler/threshold")
+  .onUpdate(async (snap, context) => {
+    logger.info("onboilerthreshold: change in device", context.params.devId, "threshold from", snap.before.val(), "to", snap.after.val());
+    const appOptions = JSON.parse(process.env.FIREBASE_CONFIG);
+    appOptions.databaseAuthVariableOverride = context.auth;
+    const app = admin.initializeApp(appOptions, "app");
+    const deleteApp = () => app.delete().catch(() => null);
+
+    const tempVal = await getVal(app,  "/root/devices/" + context.params.devId + "/status/temperature");
+    if (tempVal == undefined || isNaN(tempVal)) {
+      logger.error("onboilerthreshold: invalid tempVal", tempVal);
       return deleteApp();
-    }).catch((err) => {
-      console.log("ondeviceactive: error" + err);
-      return deleteApp().then(() => Promise.reject(err));
-    });
+    }
+
+    await checkBoilerActivation(app, context.params.devId, tempVal, snap.after.val());
+    return deleteApp();
+  });
+
+exports.onboilertemperature = functions.database.ref("/root/devices/{devId}/status/temperature")
+  .onUpdate(async (snap, context) => {
+    logger.info("onboilertemperature: change in device", context.params.devId, "temperature from", snap.before.val(), "to", snap.after.val());
+    const appOptions = JSON.parse(process.env.FIREBASE_CONFIG);
+    appOptions.databaseAuthVariableOverride = context.auth;
+    const app = admin.initializeApp(appOptions, "app");
+    const deleteApp = () => app.delete().catch(() => null);
+
+    const thresholdVal = await getVal(app,  "/root/devices/" + context.params.devId + "/configuration/boiler/threshold");
+    if (thresholdVal == undefined || isNaN(thresholdVal)) {
+      logger.error("onboilertemperature: invalid thresholdVal", thresholdVal);
+      return deleteApp();
+    }
+
+    await checkBoilerActivation(app, context.params.devId, snap.after.val(), thresholdVal);
+    return deleteApp();
+  });
+
+exports.onlastwateringactivation = functions.database.ref("/root/devices/{devId}/status/lastWateringActivation")
+  .onUpdate(async (snap, context) => {
+    logger.info("onlastwateringactivation: change in device", context.params.devId, "lastWateringActivation from", snap.before.val(), "to", snap.after.val());
+    const appOptions = JSON.parse(process.env.FIREBASE_CONFIG);
+    appOptions.databaseAuthVariableOverride = context.auth;
+    const app = admin.initializeApp(appOptions, "app");
+    const deleteApp = () => app.delete().catch(() => null);
+
+    if (isNaN(snap.after.val()) || snap.after.val() <= 0) {
+      logger.error("onlastwateringactivation: invalid lastWateringActivation", lastWateringActivation);
+      return deleteApp();
+    }
+
+    await checkWateringActivation(app, context.params.devId, snap.after.val());
+    return deleteApp();
+  });
+
+exports.onheartbeat = functions.database.ref("/root/devices/{devId}/status/esp8266/heartbeat")
+  .onUpdate(async (snap, context) => {
+    logger.info("onHeartBeat: change in device", context.params.devId, "heartbeat from", snap.before.val(), "to", snap.after.val());
+    const appOptions = JSON.parse(process.env.FIREBASE_CONFIG);
+    appOptions.databaseAuthVariableOverride = context.auth;
+    const app = admin.initializeApp(appOptions, "app");
+    const deleteApp = () => app.delete().catch(() => null);
+
+    const lastWateringActivationRef = "/root/devices/" + context.params.devId + "/status/lastWateringActivation";
+    const lastWateringActivation = await getVal(app, lastWateringActivationRef);
+    if (isNaN(lastWateringActivation) || lastWateringActivation <= 0) {
+      logger.error("onHeartBeat: invalid lastWateringActivation", lastWateringActivation);
+      return deleteApp();
+    }
+
+    await checkWateringActivation(app, context.params.devId, lastWateringActivation);
+    return deleteApp();
+  });
+
+exports.onwateringdeviceactive = functions.database.ref("/root/devices/{devId}/status/outputs/watering")
+  .onUpdate(async (snap, context) => {
+    logger.info("onwateringdeviceactive: change in device", context.params.devId, "output watering from", snap.before.val(), "to", snap.after.val());
+    const appOptions = JSON.parse(process.env.FIREBASE_CONFIG);
+    appOptions.databaseAuthVariableOverride = context.auth;
+    const app = admin.initializeApp(appOptions, "app");
+    const deleteApp = () => app.delete().catch(() => null);
+
+    const payload = {
+      data: {
+        thermostat: context.params.devId,
+        state: snap.after.val().toString(),
+        system: "watering"
+      },
+    };
+
+    await onActivationChange(app, payload, context.params.devId);
+    return deleteApp();
+  });
+
+exports.onboilerdeviceactive = functions.database.ref("/root/devices/{devId}/status/outputs/boiler")
+  .onUpdate(async (snap, context) => {
+    logger.info("onboilerdeviceactive: change in device", context.params.devId, "output boiler from", snap.before.val(), "to", snap.after.val());
+    const appOptions = JSON.parse(process.env.FIREBASE_CONFIG);
+    appOptions.databaseAuthVariableOverride = context.auth;
+    const app = admin.initializeApp(appOptions, "app");
+    const deleteApp = () => app.delete().catch(() => null);
+
+    const payload = {
+      data: {
+        thermostat: context.params.devId,
+        state: snap.after.val().toString(),
+        system: "boiler"
+      },
+    };
+
+    await onActivationChange(app, payload, context.params.devId);
+    return deleteApp();
   });

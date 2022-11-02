@@ -32,7 +32,7 @@
     <string name="satellite_map">Satellite Map</string>
     <string name="terrain_map">Terrain Map</string>
 
-    <string name="emulator_db_url">http://10.0.2.2:9001/?ns=thermosmart-b5382-default-rtdb</string>
+    <string name="emulator_db_url">http://10.0.2.2:9000/?ns=thermosmart-b5382-default-rtdb</string>
     <string name="db_url">https://thermosmart-b5382-default-rtdb.europe-west1.firebasedatabase.app</string>
     <string name="permission_denied_explanation">You need to grant location permission in order to select the location.</string>
     <string name="error_adding_thermostat">Error adding thermostat</string>

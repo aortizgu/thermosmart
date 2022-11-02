@@ -25,30 +25,38 @@
 
     <style media="screen">
       body { background: #ECEFF1; color: rgba(0,0,0,0.87); font-family: Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; }
-      #message { background: white; max-width: 360px; margin: 100px auto 16px; padding: 32px 24px; border-radius: 3px; }
-      #message h2 { display: block;  text-align: center;color: #ffa100; font-weight: bold; font-size: 16px; margin: 0 0 8px; }
-      #message h1 { font-size: 22px; font-weight: 300; color: rgba(0,0,0,0.6); margin: 0 0 16px;}
-      #message p { line-height: 140%; margin: 16px 0 24px; font-size: 14px; }
-      #message a { display: block; text-align: center; background: #0dcf06; text-transform: uppercase; text-decoration: none; color: white; padding: 16px ; margin: 16px ; border-radius: 4px; }
-      #message b { display: block; text-align: center; background: #039be5; text-transform: uppercase; text-decoration: none; color: white; padding: 16px ; margin: 16px ; border-radius: 4px; }
-      #message, #message a { box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24); }
+      .message { background: white; max-width: 360px; margin: 50px auto 16px; padding: 32px 24px; border-radius: 3px; }
+      .message h2 { display: block;  text-align: center;color: #ffa100; font-weight: bold; font-size: 16px; margin: 0 0 8px; }
+      .message h1 { font-size: 22px; font-weight: 300; color: rgba(0,0,0,0.6); margin: 0 0 16px;}
+      .message p { line-height: 140%; margin: 16px 0 24px; font-size: 14px; }
+      .message a { display: block; text-align: center; background: #0dcf06; text-transform: uppercase; text-decoration: none; color: white; padding: 8px ; margin: 8px ; border-radius: 4px; }
+      .message b { display: block; text-align: center; background: #039be5; text-transform: uppercase; text-decoration: none; color: white; padding: 8px ; margin: 8px ; border-radius: 4px; }
+      .message, .message a { box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24); }
       #load { color: rgba(0,0,0,0.4); text-align: center; font-size: 13px; }
       @media (max-width: 600px) {
-        body, #message { margin-top: 0; background: white; box-shadow: none; }
+        body, .message { margin-top: 0; background: white; box-shadow: none; }
         body { border-top: 16px solid #ffa100; }
       }
     </style>
   </head>
   <body>
-    <div id="message">
-      <h2>temperature read value for "dev1"</h2>
-      <a>active: <span id="active"></span></a>
+    <div class="message">
+      <h2>temperature for "dev1"</h2>
+      <a>active: <span id="boileractive"></span></a>
       <a>threshold: <span id="threshold"></span></a>
       <b id="increasethreshold">+</b>
       <b id="decreasethreshold">-</b>
       <a>temperature: <span id="temperature"></span></a>
       <b id="increasetemperature">+</b>
       <b id="decreasetemperature">-</b>
+    </div>
+    <div class="message">
+      <h2>watering for "dev1"</h2>
+      <a>active: <span id="wateringactive"></span></a>
+      <b id="startwatering">start</b>
+      <a>duration: <span id="wateringduration"></span></a>
+      <b id="increasewateringduration">+</b>
+      <b id="decreasewateringduration">-</b>
     </div>
     <p id="load">Firebase SDK Loading&hellip;</p>
 
@@ -76,12 +84,12 @@
           });
         }
 
-        const activePath = '/root/devices/dev1/status/active'
-        firebase.database().ref(activePath).on('value', snapshot => {
-          document.querySelector('#active').textContent = snapshot.val()
+        const boilerActivePath = '/root/devices/dev1/status/outputs/boiler'
+        firebase.database().ref(boilerActivePath).on('value', snapshot => {
+          document.querySelector('#boileractive').textContent = snapshot.val()
         });
 
-        const thresholdPath = '/root/devices/dev1/configuration/threshold'
+        const thresholdPath = '/root/devices/dev1/configuration/boiler/threshold'
         firebase.database().ref(thresholdPath).on('value', snapshot => {
           document.querySelector('#threshold').textContent = snapshot.val()
         });
@@ -95,6 +103,27 @@
         document.querySelector('#increasetemperature').onclick = function () { addVal(temperaturePath, 0.2); };
         document.querySelector('#decreasetemperature').onclick = function () { addVal(temperaturePath, -0.2); };
 
+        const wateringActivePath = '/root/devices/dev1/status/outputs/watering'
+        firebase.database().ref(wateringActivePath).on('value', snapshot => {
+          document.querySelector('#wateringactive').textContent = snapshot.val()
+        });
+
+        const wateringLastActivationPath = '/root/devices/dev1/status/lastWateringActivation'
+        document.querySelector('#startwatering').onclick = function () { 
+          firebase.database().ref(wateringLastActivationPath).set(Math.round(Date.now() / 1000))
+        };
+
+        const wateringDurationPath = '/root/devices/dev1/configuration/watering/durationMinute'
+        firebase.database().ref(wateringDurationPath).on('value', snapshot => {
+          document.querySelector('#wateringduration').textContent = snapshot.val()
+        });
+        document.querySelector('#increasewateringduration').onclick = function () { addVal(wateringDurationPath, 1); };
+        document.querySelector('#decreasewateringduration').onclick = function () { addVal(wateringDurationPath, -1); };
+
+        const esp8266HeartBeatPath = '/root/devices/dev1/status/esp8266/heartbeat'
+        setInterval(()=>{
+          firebase.database().ref(esp8266HeartBeatPath).set(Math.round(Date.now() / 1000))
+        }, 10000);
         try {
           let app = firebase.app();
           let features = [
