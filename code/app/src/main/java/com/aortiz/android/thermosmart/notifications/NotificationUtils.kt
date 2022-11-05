@@ -2,14 +2,16 @@ package com.aortiz.android.thermosmart.notifications
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.app.PendingIntent.FLAG_IMMUTABLE
+import android.app.PendingIntent
 import android.app.TaskStackBuilder
 import android.content.Context
+import android.content.Intent
 import android.graphics.BitmapFactory
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import com.aortiz.android.thermosmart.R
 import timber.log.Timber
+
 
 private const val NOTIFICATION_CHANNEL_ID =
     "com.google.firebase.messaging.default_notification_channel_id_0"
@@ -31,13 +33,22 @@ fun sendNotification(context: Context, title: String, body: String, thermostatId
         notificationManager.createNotificationChannel(channel)
     }
 
-    val intent =
-        DetailNotificationActivity.newIntent(context.applicationContext, thermostatId)
-    val stackBuilder = TaskStackBuilder.create(context)
-        .addParentStack(DetailNotificationActivity::class.java)
-        .addNextIntent(intent)
-    val notificationPendingIntent = stackBuilder.getPendingIntent(intId, FLAG_IMMUTABLE)
+//    val intent =
+//        NotificationActivity.newIntent(context.applicationContext, thermostatId)
+//    val stackBuilder = TaskStackBuilder.create(context)
+////        .addParentStack(NotificationActivity::class.java)
+//        .addNextIntentWithParentStack(intent)
+//    val notificationPendingIntent = stackBuilder.getPendingIntent(intId, FLAG_IMMUTABLE)
 
+    val intent =
+        NotificationActivity.newIntent(context.applicationContext, thermostatId)
+    val notificationPendingIntent: PendingIntent? = TaskStackBuilder.create(context).run {
+        // Add the intent, which inflates the back stack
+        addNextIntentWithParentStack(intent)
+        // Get the PendingIntent containing the entire back stack
+        getPendingIntent(0,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE)
+    }
     val builder = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID)
         .setSmallIcon(R.drawable.ic_stat_name)
         .setLargeIcon(

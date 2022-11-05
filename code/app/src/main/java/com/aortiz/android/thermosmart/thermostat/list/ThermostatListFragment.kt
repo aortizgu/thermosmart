@@ -1,8 +1,10 @@
 package com.aortiz.android.thermosmart.thermostat.list
 
+import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
 import android.view.*
+import android.widget.Toast
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.databinding.DataBindingUtil
@@ -12,7 +14,8 @@ import androidx.navigation.fragment.findNavController
 import com.aortiz.android.thermosmart.R
 import com.aortiz.android.thermosmart.authentication.AuthenticationActivity
 import com.aortiz.android.thermosmart.databinding.ThermostatListFragmentBinding
-import com.aortiz.android.thermosmart.thermostat.detail.ThermostatDetailFragmentDirections
+import com.aortiz.android.thermosmart.thermostat.MainActivity
+import com.aortiz.android.thermosmart.utils.ERROR
 import com.aortiz.android.thermosmart.utils.setDisplayHomeAsUpEnabled
 import com.firebase.ui.auth.AuthUI
 import com.google.firebase.auth.ktx.auth
@@ -28,7 +31,7 @@ class ThermostatListFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         Timber.i("onCreateView")
         setDisplayHomeAsUpEnabled(false)
         binding =
@@ -38,13 +41,24 @@ class ThermostatListFragment : Fragment() {
             )
         binding.viewModel = viewModel
         binding.thermostatRecyclerView.adapter =
-            ThermostatAdapter(ThermostatClickListener { thermostat ->
-                Timber.d("click on $thermostat")
+            ThermostatAdapter(ThermostatClickListener({ thermostat ->
                 findNavController().navigate(
                     ThermostatListFragmentDirections.actionThermostatListFragmentToThermostatDetailFragment(
                         thermostat.id!!
                     )
                 )
+            }) { thermostat ->
+                AlertDialog.Builder(activity)
+                    .setTitle(getString(R.string.delete_fragment_dialog_title, thermostat.configuration.name))
+                    .setPositiveButton(
+                        getString(com.aortiz.android.thermosmart.R.string.option_yes)
+                    ) { _, _ -> thermostat.id?.let { viewModel.unfollowThermostat(it) } }
+                    .setNegativeButton(
+                        getString(com.aortiz.android.thermosmart.R.string.option_no)
+                    ) { _, _ -> }
+                    .create()
+                    .show()
+                true
             })
         return binding.root
     }
@@ -58,12 +72,14 @@ class ThermostatListFragment : Fragment() {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
                 menuInflater.inflate(R.menu.menu_main, menu)
             }
+
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
                 return when (menuItem.itemId) {
                     R.id.action_logout -> {
                         AuthUI.getInstance().signOut(requireContext()).addOnCompleteListener {
                             Firebase.auth.signOut()
-                            val intent = Intent(requireContext(), AuthenticationActivity::class.java)
+                            val intent =
+                                Intent(requireContext(), AuthenticationActivity::class.java)
                             startActivity(intent)
                             requireActivity().finish()
                         }
@@ -78,7 +94,74 @@ class ThermostatListFragment : Fragment() {
             }
         }, viewLifecycleOwner, Lifecycle.State.RESUMED)
         binding.addThermostatButton.setOnClickListener {
-            findNavController().navigate(ThermostatListFragmentDirections.actionThermostatListFragmentToThermostatSaveFragment())
+            ThermostatAddDialog { deviceId ->
+                viewModel.followThermostat(deviceId)
+            }.show(
+                childFragmentManager,
+                ThermostatListFragment::class.toString()
+            )
+        }
+        viewModel.followState.observe(viewLifecycleOwner) {
+            Timber.i("saveState: $it")
+            when (it) {
+                ThermostatListViewModel.FollowState.FOLLOWED -> {
+                    //findNavController().popBackStack()
+                    viewModel.clearFollowState()
+                }
+                ThermostatListViewModel.FollowState.ERROR -> {
+                    viewModel.clearFollowState()
+                }
+                ThermostatListViewModel.FollowState.IDLE -> {
+                }
+                null -> {
+                }
+            }
+        }
+        viewModel.unfollowState.observe(viewLifecycleOwner) {
+            Timber.i("unfollowState: $it")
+            when (it) {
+                ThermostatListViewModel.UnfollowState.UNFOLLOWED -> {
+                    viewModel.clearUnfollowState()
+                }
+                ThermostatListViewModel.UnfollowState.ERROR -> {
+                    viewModel.clearUnfollowState()
+                }
+                ThermostatListViewModel.UnfollowState.IDLE -> {
+                }
+                null -> {
+                }
+            }
+        }
+        viewModel.errorCode.observe(viewLifecycleOwner) {
+            it?.let {
+                Timber.i("errorCode: $it")
+                val message = when (it) {
+                    ERROR.ALREADY_FOLLOWING -> R.string.already_following
+                    ERROR.INVALID_DEVICE -> R.string.invalid_device
+                    ERROR.INVALID_USER -> R.string.invlid_user
+                    ERROR.NOT_FOLLOWING -> R.string.not_following
+                    else -> R.string.error_adding_thermostat
+                }
+                Toast.makeText(
+                    context,
+                    getString(message),
+                    Toast.LENGTH_SHORT
+                ).show()
+                viewModel.clearError()
+            }
+        }
+        viewModel.thermostatList.observe(viewLifecycleOwner) { list ->
+            try {
+                if ((activity as MainActivity).isFirstNavigation() && list.size == 1) {
+                    findNavController().navigate(
+                        ThermostatListFragmentDirections.actionThermostatListFragmentToThermostatDetailFragment(
+                            list.first().id!!
+                        )
+                    )
+                }
+            } catch (e: java.lang.Exception){
+                Timber.e("error $e")
+            }
         }
     }
 }

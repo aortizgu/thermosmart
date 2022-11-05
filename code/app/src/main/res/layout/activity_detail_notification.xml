@@ -4,10 +4,12 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data>
+
         <variable
             name="viewModel"
             type="com.aortiz.android.thermosmart.thermostat.detail.ThermostatDetailViewModel" />
     </data>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -70,7 +72,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="@dimen/margin_small"
-                    android:text="@{viewModel.thermostat.name}"
+                    android:text="@{viewModel.thermostat.configuration.name}"
                     app:layout_constraintBaseline_toBaselineOf="@+id/thermostatNameTextView"
                     app:layout_constraintStart_toEndOf="@+id/thermostatNameTextView"
                     tools:text="My thermostat" />
@@ -94,7 +96,7 @@
                     android:layout_marginStart="@dimen/margin_small"
                     app:layout_constraintBaseline_toBaselineOf="@+id/thermostatThresholdTextView"
                     app:layout_constraintStart_toEndOf="@+id/thermostatThresholdTextView"
-                    app:tempText="@{viewModel.thermostat.threshold}"
+                    app:tempText="@{viewModel.thermostat.configuration.boiler.threshold}"
                     tools:text="22.5 ºC" />
 
                 <TextView
@@ -118,7 +120,7 @@
                     android:layout_marginStart="@dimen/margin_small"
                     app:layout_constraintBaseline_toBaselineOf="@+id/thermostatTmepTextView"
                     app:layout_constraintStart_toEndOf="@+id/thermostatTmepTextView"
-                    app:tempText="@{viewModel.thermostat.temperature}"
+                    app:tempText="@{viewModel.thermostat.status.temperature}"
                     tools:text="20.5 ºC" />
 
                 <ImageView
@@ -129,7 +131,7 @@
                     android:layout_marginBottom="@dimen/margin_small"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:thermostatStatusImage="@{viewModel.thermostat.active}"
+                    app:thermostatStatusImage="@{viewModel.thermostat}"
                     tools:src="@drawable/ic_power_off" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>

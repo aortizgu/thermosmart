@@ -51,7 +51,11 @@ class ThermostatDiffCallback : DiffUtil.ItemCallback<Thermostat>() {
     }
 }
 
-class ThermostatClickListener(val clickListener: (thermostat: Thermostat) -> Unit) {
+class ThermostatClickListener(
+    val clickListener: (thermostat: Thermostat) -> Unit,
+    val longClickListener: (thermostat: Thermostat) -> Boolean
+) {
     fun onClick(thermostat: Thermostat) = clickListener(thermostat)
+    fun onLongClick(thermostat: Thermostat) = longClickListener(thermostat)
 }
 

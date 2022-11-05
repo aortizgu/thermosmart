@@ -7,7 +7,7 @@
 
         <variable
             name="viewModel"
-            type="com.aortiz.android.thermosmart.thermostat.config.ThermostatConfigViewModel" />
+            type="com.aortiz.android.thermosmart.thermostat.selectlocation.ThermostatSelectLocationViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout

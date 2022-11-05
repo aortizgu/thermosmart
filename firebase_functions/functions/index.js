@@ -19,7 +19,7 @@ async function getVal(app, ref) {
 
 async function sendNotification(app, payload, user) {
 
-  logger.info("sendNotification: payload", payload, ", user", user);
+  logger.info("sendNotification: payload", JSON.stringify(payload), ", user", user);
 
   const tokenRef = "/root/users/" + user + "/token";
   const token = await getVal(app, tokenRef);
@@ -59,20 +59,22 @@ async function sendNotification(app, payload, user) {
 
 async function onActivationChange(app, payload, devId) {
 
-  const followers = await getVal(app, "/root/devices/" + devId + "/configuration/followers");
-  if (followers == undefined) {
-    logger.error("onActivationChange: invalid followersRef", followers);
+  const config = await getVal(app, "/root/devices/" + devId + "/configuration");
+  if (config == undefined) {
+    logger.error("onActivationChange: invalid config", config);
     return;
   }
 
-  for (let index = 0; index < followers.length; index++) {
-    const folower = followers[index]
+  payload.name = config.name;
+
+  for (let index = 0; index < config.followers.length; index++) {
+    const folower = config.followers[index]
     await sendNotification(app, payload, folower);
   }
 
 }
 
-async function checkBoilerActivation(app, devId, tempVal, thresholdVal) {
+async function checkBoilerActivation(app, devId, tempVal, boilerConfig) {
 
   const activeRef = "/root/devices/" + devId + "/status/outputs/boiler";
   const activeVal = await getVal(app, activeRef);
@@ -82,17 +84,20 @@ async function checkBoilerActivation(app, devId, tempVal, thresholdVal) {
   }
 
   let needActivation = false;
-  const hysteresis = 0.50;
-  if (activeVal) {
-    needActivation = tempVal < (thresholdVal + hysteresis);
-  } else {
-    needActivation = tempVal < (thresholdVal - hysteresis);
+  if (boilerConfig.automaticActivationEnabled) {
+    const hysteresis = 0.50;
+    if (activeVal) {
+      needActivation = tempVal < (boilerConfig.threshold + hysteresis);
+    } else {
+      needActivation = tempVal < (boilerConfig.threshold - hysteresis);
+    }  
   }
 
-  logger.debug("checkBoilerActivation: thresholdVal", thresholdVal
+  logger.debug("checkBoilerActivation: threshold", boilerConfig.threshold
     , ", tempVal", tempVal
     , ", active", activeVal
-    , ", needActivation", needActivation);
+    , ", needActivation", needActivation
+    , ", automaticActivationEnabled", boilerConfig.automaticActivationEnabled);
 
   if (activeVal != needActivation) {
     if (activeVal && !needActivation) {
@@ -120,7 +125,7 @@ async function checkAutomatedActivationNeeded(app, devId) {
     return false;
   }
 
-  if (wateringConfig.automaticWateringEnabled == false) {
+  if (wateringConfig.automaticActivationEnabled == false) {
     logger.debug("checkAutomatedActivationNeeded: automated activation disabled");
     return false;
   }
@@ -132,19 +137,20 @@ async function checkAutomatedActivationNeeded(app, devId) {
     return false;
   }
 
-  const epochNow = Math.round(Date.now() / 1000)
+  const epochNow = Math.round(Date.now() / 1000);
   if (epochNow < nextWateringActivation) {
     logger.debug("checkAutomatedActivationNeeded: automated activation does not need to be activated");
     return false;
   }
 
-  let nextDate = new Date()
-  nextDate.setDate(nextDate.getDate() + wateringConfig.frecuencyDay);
+  let nextDate = new Date();
+  nextDate.setDate(nextDate.getDate() + wateringConfig.frequencyDay);
   nextDate.setHours(wateringConfig.activationHour);
   nextDate.setMinutes(0);
   nextDate.setSeconds(0);
   nextDate.setMilliseconds(0);
   const nextEpochTime = Math.round(nextDate.getTime() / 1000);
+  logger.info("onwateringdeviceactive: updating next activation time, ", nextEpochTime);
 
   await app.database().ref(nextWateringActivationRef).set(nextEpochTime).then(() => {
     logger.info("onwateringdeviceactive: updated next activation time, ", nextEpochTime);
@@ -213,9 +219,9 @@ async function checkWateringActivation(app, devId, lastWateringActivation) {
   }
 }
 
-exports.onboilerthreshold = functions.database.ref("/root/devices/{devId}/configuration/boiler/threshold")
+exports.onboilerconfig = functions.database.ref("/root/devices/{devId}/configuration/boiler")
   .onUpdate(async (snap, context) => {
-    logger.info("onboilerthreshold: change in device", context.params.devId, "threshold from", snap.before.val(), "to", snap.after.val());
+    logger.info("onboilerconfig: change in device", context.params.devId, "boiler config from", JSON.stringify(snap.before.val()), "to", JSON.stringify(snap.after.val()));
     const appOptions = JSON.parse(process.env.FIREBASE_CONFIG);
     appOptions.databaseAuthVariableOverride = context.auth;
     const app = admin.initializeApp(appOptions, "app");
@@ -223,7 +229,7 @@ exports.onboilerthreshold = functions.database.ref("/root/devices/{devId}/config
 
     const tempVal = await getVal(app,  "/root/devices/" + context.params.devId + "/status/temperature");
     if (tempVal == undefined || isNaN(tempVal)) {
-      logger.error("onboilerthreshold: invalid tempVal", tempVal);
+      logger.error("onboilerconfig: invalid tempVal", tempVal);
       return deleteApp();
     }
 
@@ -239,13 +245,13 @@ exports.onboilertemperature = functions.database.ref("/root/devices/{devId}/stat
     const app = admin.initializeApp(appOptions, "app");
     const deleteApp = () => app.delete().catch(() => null);
 
-    const thresholdVal = await getVal(app,  "/root/devices/" + context.params.devId + "/configuration/boiler/threshold");
-    if (thresholdVal == undefined || isNaN(thresholdVal)) {
-      logger.error("onboilertemperature: invalid thresholdVal", thresholdVal);
+    const boilerConfig = await getVal(app,  "/root/devices/" + context.params.devId + "/configuration/boiler");
+    if (boilerConfig == undefined) {
+      logger.error("onboilertemperature: invalid boilerConfig", boilerConfig);
       return deleteApp();
     }
 
-    await checkBoilerActivation(app, context.params.devId, snap.after.val(), thresholdVal);
+    await checkBoilerActivation(app, context.params.devId, snap.after.val(), boilerConfig);
     return deleteApp();
   });
 
@@ -295,7 +301,7 @@ exports.onwateringdeviceactive = functions.database.ref("/root/devices/{devId}/s
 
     const payload = {
       data: {
-        thermostat: context.params.devId,
+        id: context.params.devId,
         state: snap.after.val().toString(),
         system: "watering"
       },
@@ -315,7 +321,7 @@ exports.onboilerdeviceactive = functions.database.ref("/root/devices/{devId}/sta
 
     const payload = {
       data: {
-        thermostat: context.params.devId,
+        id: context.params.devId,
         state: snap.after.val().toString(),
         system: "boiler"
       },

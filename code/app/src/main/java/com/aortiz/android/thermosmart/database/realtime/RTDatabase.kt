@@ -4,9 +4,7 @@ import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.map
 import com.aortiz.android.thermosmart.R
-import com.aortiz.android.thermosmart.database.DBSnapShot
-import com.aortiz.android.thermosmart.database.DBThermostat
-import com.aortiz.android.thermosmart.database.DBThermostatConfiguration
+import com.aortiz.android.thermosmart.database.*
 import com.aortiz.android.thermosmart.utils.ERROR
 import com.aortiz.android.thermosmart.utils.OperationResult
 import com.google.firebase.auth.ktx.auth
@@ -19,15 +17,23 @@ import timber.log.Timber
 class RTDatabase(context: Context) {
 
     private var database: FirebaseDatabase =
-        Firebase.database(context.getString(R.string.db_url))
-        //Firebase.database(context.getString(R.string.emulator_db_url))
+        //Firebase.database(context.getString(R.string.db_url))
+        Firebase.database(context.getString(R.string.emulator_db_url))
 
     companion object {
         const val ROOT_REFERENCE = "root"
         const val DEVICES_REFERENCE = "devices"
         const val USERS_REFERENCE = "users"
+        const val NAME_REFERENCE = "name"
         const val CONFIG_REFERENCE = "configuration"
+        const val STATUS_REFERENCE = "status"
+        const val LOCATION_REFERENCE = "location"
+        const val LAST_WATERING_ACTIVATION_REFERENCE = "lastWateringActivation"
         const val FOLLOWERS_REFERENCE = "followers"
+        const val AUTOMATIC_ACTIVATION_ENABLED_REFERENCE = "automaticActivationEnabled"
+        const val BOILER_REFERENCE = "boiler"
+        const val WATERING_REFERENCE = "watering"
+        const val THRESHOLD_REFERENCE = "threshold"
         const val TOKEN_REFERENCE = "token"
         const val ID_REFERENCE = "id"
     }
@@ -59,7 +65,7 @@ class RTDatabase(context: Context) {
         )
     }
 
-    fun getUserThermostatListLiveData(): LiveData<List<DBThermostat>>{
+    fun getUserThermostatListLiveData(): LiveData<List<DBThermostat>> {
         return FirebaseDatabaseLiveData(
             database.getReference("$ROOT_REFERENCE"),
             DBSnapShot::class.java
@@ -67,7 +73,7 @@ class RTDatabase(context: Context) {
             val uid = Firebase.auth.currentUser?.uid
             if (uid != null) {
                 val deviceList = snapShot.devices?.values?.toList()
-                if (deviceList != null){
+                if (deviceList != null) {
                     return@map deviceList.filter { device ->
                         val deviceFollowers = device.configuration?.followers
                         if (deviceFollowers != null) {
@@ -113,12 +119,25 @@ class RTDatabase(context: Context) {
             }
     }
 
-    fun setThermostatConfig(id: String?, configuration: DBThermostatConfiguration?) {
+    fun setThermostatConfig(
+        id: String?,
+        configuration: DBThermostatConfiguration?,
+        cb: (result: OperationResult<String>) -> Unit
+    ) {
         database.getReference("$ROOT_REFERENCE/$DEVICES_REFERENCE/$id/$CONFIG_REFERENCE")
             .setValue(configuration).addOnSuccessListener {
                 Timber.i("setThermostatConfig: data saved")
+                cb(OperationResult.Success("data saved"))
+                return@addOnSuccessListener
             }.addOnFailureListener {
                 Timber.e("setThermostatConfig: Error saving data $it")
+                cb(
+                    OperationResult.Error(
+                        Exception("Error $it"),
+                        ERROR.UNKNOWN
+                    )
+                )
+                return@addOnFailureListener
             }
     }
 
@@ -129,7 +148,7 @@ class RTDatabase(context: Context) {
             val reference =
                 database.getReference("$ROOT_REFERENCE/$DEVICES_REFERENCE")
             reference.get()
-                .addOnSuccessListener addOnSuccessListener1@ { dataSnapshot ->
+                .addOnSuccessListener addOnSuccessListener1@{ dataSnapshot ->
                     if (dataSnapshot.hasChild(id)) {
                         var devicesList = dataSnapshot.child(id).child(CONFIG_REFERENCE)
                             .child(FOLLOWERS_REFERENCE).getValue<ArrayList<String>>() ?: ArrayList()
@@ -188,7 +207,7 @@ class RTDatabase(context: Context) {
             val reference =
                 database.getReference("$ROOT_REFERENCE/$DEVICES_REFERENCE/$id/$CONFIG_REFERENCE/$FOLLOWERS_REFERENCE")
             reference.get()
-                .addOnSuccessListener addOnSuccessListener1@ { dataSnapshot ->
+                .addOnSuccessListener addOnSuccessListener1@{ dataSnapshot ->
                     var devicesList = dataSnapshot.getValue<ArrayList<String>>() ?: ArrayList()
                     if (devicesList.contains(userId)) {
                         devicesList.remove(userId)
@@ -237,6 +256,163 @@ class RTDatabase(context: Context) {
                 }.addOnFailureListener {
                     Timber.d("updateDeviceToken: error $it")
                 }
+        }
+    }
+
+    fun setControllerName(
+        id: String,
+        name: String,
+        cb: (result: OperationResult<String>) -> Unit
+    ) {
+        val userId = Firebase.auth.currentUser?.uid
+        if (userId != null) {
+            Timber.d("changeThermostatName: new name $name, for id $id")
+            database.getReference("$ROOT_REFERENCE/$DEVICES_REFERENCE/$id/$CONFIG_REFERENCE/$NAME_REFERENCE")
+                .setValue(name)
+                .addOnSuccessListener {
+                    cb(OperationResult.Success("Updated"))
+                    return@addOnSuccessListener
+                }
+                .addOnFailureListener {
+                    cb(OperationResult.Error(Exception("Error $it"), ERROR.UNKNOWN))
+                    return@addOnFailureListener
+                }
+        } else {
+            Timber.d("setControllerName: cannot get user")
+            cb(OperationResult.Error(Exception("Error getting user"), ERROR.INVALID_USER))
+        }
+    }
+
+    fun setControllerLocation(
+        id: String,
+        location: DBLocationConfiguration,
+        cb: (result: OperationResult<String>) -> Unit
+    ) {
+        val userId = Firebase.auth.currentUser?.uid
+        if (userId != null) {
+            Timber.d("setControllerLocation: new location $location, for id $id")
+            database.getReference("$ROOT_REFERENCE/$DEVICES_REFERENCE/$id/$CONFIG_REFERENCE/$LOCATION_REFERENCE")
+                .setValue(location).addOnSuccessListener {
+                    cb(OperationResult.Success("data saved"))
+                    return@addOnSuccessListener
+                }.addOnFailureListener {
+                    cb(
+                        OperationResult.Error(
+                            Exception("Error $it"),
+                            ERROR.UNKNOWN
+                        )
+                    )
+                    return@addOnFailureListener
+                }
+        } else {
+            Timber.d("setControllerLocation: cannot get user")
+            cb(OperationResult.Error(Exception("Error getting user"), ERROR.INVALID_USER))
+        }
+    }
+
+    fun setControllerBoilerAutomaticActivation(id: String, checked: Boolean, cb: (result: OperationResult<String>) -> Unit) {
+        val userId = Firebase.auth.currentUser?.uid
+        if (userId != null) {
+            Timber.d("setControllerBoilerAutomaticActivation: new state $checked, for id $id")
+            database.getReference("$ROOT_REFERENCE/$DEVICES_REFERENCE/$id/$CONFIG_REFERENCE/$BOILER_REFERENCE/$AUTOMATIC_ACTIVATION_ENABLED_REFERENCE")
+                .setValue(checked)
+                .addOnSuccessListener {
+                    cb(OperationResult.Success("Updated"))
+                    return@addOnSuccessListener
+                }
+                .addOnFailureListener {
+                    cb(OperationResult.Error(Exception("Error $it"), ERROR.UNKNOWN))
+                    return@addOnFailureListener
+                }
+        } else {
+            Timber.d("setControllerBoilerAutomaticActivation: cannot get user")
+            cb(OperationResult.Error(Exception("Error getting user"), ERROR.INVALID_USER))
+        }
+    }
+
+    fun setControllerWateringAutomaticActivation(id: String, checked: Boolean, cb: (result: OperationResult<String>) -> Unit) {
+        val userId = Firebase.auth.currentUser?.uid
+        if (userId != null) {
+            Timber.d("setControllerWateringAutomaticActivation: new state $checked, for id $id")
+            database.getReference("$ROOT_REFERENCE/$DEVICES_REFERENCE/$id/$CONFIG_REFERENCE/$WATERING_REFERENCE/$AUTOMATIC_ACTIVATION_ENABLED_REFERENCE")
+                .setValue(checked)
+                .addOnSuccessListener {
+                    cb(OperationResult.Success("Updated"))
+                    return@addOnSuccessListener
+                }
+                .addOnFailureListener {
+                    cb(OperationResult.Error(Exception("Error $it"), ERROR.UNKNOWN))
+                    return@addOnFailureListener
+                }
+        } else {
+            Timber.d("setControllerWateringAutomaticActivation: cannot get user")
+            cb(OperationResult.Error(Exception("Error getting user"), ERROR.INVALID_USER))
+        }
+    }
+
+    fun setControllerBoilerThreshold(id: String, threshold: Double, cb: (result: OperationResult<String>) -> Unit) {
+        val userId = Firebase.auth.currentUser?.uid
+        if (userId != null) {
+            Timber.d("setControllerBoilerThreshold: new threshold $threshold, for id $id")
+            database.getReference("$ROOT_REFERENCE/$DEVICES_REFERENCE/$id/$CONFIG_REFERENCE/$BOILER_REFERENCE/$THRESHOLD_REFERENCE")
+                .setValue(threshold)
+                .addOnSuccessListener {
+                    cb(OperationResult.Success("Updated"))
+                    return@addOnSuccessListener
+                }
+                .addOnFailureListener {
+                    cb(OperationResult.Error(Exception("Error $it"), ERROR.UNKNOWN))
+                    return@addOnFailureListener
+                }
+        } else {
+            Timber.d("setControllerBoilerAutomaticActivation: cannot get user")
+            cb(OperationResult.Error(Exception("Error getting user"), ERROR.INVALID_USER))
+        }
+    }
+
+    fun setControllerWateringConfig(id: String, wateringConfig: DBWateringConfiguration, cb: (result: OperationResult<String>) -> Unit) {
+        val userId = Firebase.auth.currentUser?.uid
+        if (userId != null) {
+            Timber.d("setControllerWateringConfig: new wateringConfig $wateringConfig, for id $id")
+            database.getReference("$ROOT_REFERENCE/$DEVICES_REFERENCE/$id/$CONFIG_REFERENCE/$WATERING_REFERENCE")
+                .setValue(wateringConfig).addOnSuccessListener {
+                    cb(OperationResult.Success("data saved"))
+                    return@addOnSuccessListener
+                }.addOnFailureListener {
+                    cb(
+                        OperationResult.Error(
+                            Exception("Error $it"),
+                            ERROR.UNKNOWN
+                        )
+                    )
+                    return@addOnFailureListener
+                }
+        } else {
+            Timber.d("setControllerWateringConfig: cannot get user")
+            cb(OperationResult.Error(Exception("Error getting user"), ERROR.INVALID_USER))
+        }
+    }
+
+    fun setControllerLastWateringActivation(id: String, epochSecond: Long, cb: (result: OperationResult<String>) -> Unit) {
+        val userId = Firebase.auth.currentUser?.uid
+        if (userId != null) {
+            Timber.d("setControllerLastWateringActivation: new lastWateringActivation $epochSecond, for id $id")
+            database.getReference("$ROOT_REFERENCE/$DEVICES_REFERENCE/$id/$STATUS_REFERENCE/$LAST_WATERING_ACTIVATION_REFERENCE")
+                .setValue(epochSecond).addOnSuccessListener {
+                    cb(OperationResult.Success("data saved"))
+                    return@addOnSuccessListener
+                }.addOnFailureListener {
+                    cb(
+                        OperationResult.Error(
+                            Exception("Error $it"),
+                            ERROR.UNKNOWN
+                        )
+                    )
+                    return@addOnFailureListener
+                }
+        } else {
+            Timber.d("setControllerWateringConfig: cannot get user")
+            cb(OperationResult.Error(Exception("Error getting user"), ERROR.INVALID_USER))
         }
     }
 }

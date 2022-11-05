@@ -3,6 +3,7 @@ package com.aortiz.android.thermosmart.repository
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.map
+import com.aortiz.android.thermosmart.database.DBLocationConfiguration
 import com.aortiz.android.thermosmart.database.DBThermostat
 import com.aortiz.android.thermosmart.database.local.SharedPreferencesDatabase
 import com.aortiz.android.thermosmart.database.realtime.FirebaseDatabaseLiveData
@@ -67,24 +68,24 @@ class ThermostatRepository(
         return rtdb.getThermostatLiveData(thermostatId)
     }
 
-    fun getUserThermostatListLiveData(): LiveData<List<Thermostat>>{
+    fun getUserThermostatListLiveData(): LiveData<List<Thermostat>> {
         return rtdb.getUserThermostatListLiveData().map { list ->
             Timber.i("list size ${list.size}")
-            list.map{ item ->
+            list.map { item ->
                 Timber.i("item id ${item.id}")
                 item.asDomainModel()
             }
         }
     }
 
-    fun getThermostat(thermostatId: String, cb: (result: OperationResult<DBThermostat>) -> Unit) {
-        return rtdb.getThermostat(thermostatId, cb)
-    }
+//    fun getThermostat(thermostatId: String, cb: (result: OperationResult<DBThermostat>) -> Unit) {
+//        return rtdb.getThermostat(thermostatId, cb)
+//    }
 
-    fun setThermostatConfig(thermostat: Thermostat) {
-        val dbObject = thermostat.asDBThermostat()
-        rtdb.setThermostatConfig(dbObject.id, dbObject.configuration)
-    }
+//    fun setThermostatConfig(thermostat: Thermostat, cb: (result: OperationResult<String>) -> Unit) {
+//        val dbObject = thermostat.asDBThermostat()
+//        rtdb.setThermostatConfig(dbObject.id, dbObject.configuration, cb)
+//    }
 
     fun followThermostat(id: String, cb: (result: OperationResult<String>) -> Unit) {
         rtdb.followThermostat(id, cb)
@@ -114,6 +115,48 @@ class ThermostatRepository(
         _cityName.postValue(null)
         _exteriorTemp.postValue(null)
         _exteriorImage.postValue(null)
+    }
+
+    fun setControllerName(id: String, name: String, cb: (result: OperationResult<String>) -> Unit) {
+        rtdb.setControllerName(id, name, cb)
+    }
+
+    fun setControllerLocation(
+        id: String,
+        latitude: Double,
+        longitude: Double,
+        location: String,
+        cb: (result: OperationResult<String>) -> Unit
+    ) {
+        rtdb.setControllerLocation(id, DBLocationConfiguration(latitude, longitude, location), cb)
+    }
+
+    fun setControllerBoilerAutomaticActivation(
+        id: String,
+        checked: Boolean,
+        cb: (result: OperationResult<String>) -> Unit
+    ) {
+        rtdb.setControllerBoilerAutomaticActivation(id, checked, cb)
+    }
+
+    fun setControllerWateringAutomaticActivation(
+        id: String,
+        checked: Boolean,
+        cb: (result: OperationResult<String>) -> Unit
+    ) {
+        rtdb.setControllerWateringAutomaticActivation(id, checked, cb)
+    }
+
+    fun setControllerBoilerThreshold(id: String, threshold: Double, cb: (result: OperationResult<String>) -> Unit) {
+        rtdb.setControllerBoilerThreshold(id, threshold, cb)
+    }
+
+    fun setControllerWateringConfig(id: String, wateringConfig: Thermostat.Configuration.Watering, cb: (result: OperationResult<String>) -> Unit) {
+        rtdb.setControllerWateringConfig(id, wateringConfig.asDBWateringConfiguration(), cb)
+    }
+
+    fun setControllerLastWateringActivation(id: String, epochSecond: Long, cb: (result: OperationResult<String>) -> Unit) {
+        rtdb.setControllerLastWateringActivation(id, epochSecond, cb)
     }
 
 }

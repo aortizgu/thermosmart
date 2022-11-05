@@ -1,5 +1,6 @@
 package com.aortiz.android.thermosmart.network
 
+import com.aortiz.android.thermosmart.network.ApiOpenWeatherService.Companion.API_BASE_URL
 import com.aortiz.android.thermosmart.network.ApiOpenWeatherService.Companion.BASE_URL
 import com.jakewharton.retrofit2.adapter.kotlin.coroutines.CoroutineCallAdapterFactory
 import com.squareup.moshi.Moshi
@@ -15,8 +16,8 @@ interface ApiOpenWeatherService {
 
     companion object {
         const val WEATHER = "/data/2.5/weather"
-        const val IMAGE = "/img/w/{icon}.png"
-        const val BASE_URL = "https://api.openweathermap.org"
+        const val API_BASE_URL = "https://api.openweathermap.org"
+        const val BASE_URL = "https://openweathermap.org"
     }
 
     @GET(WEATHER)
@@ -36,7 +37,7 @@ object Network {
         .build()
 
     private val retrofit = Retrofit.Builder()
-        .baseUrl(BASE_URL)
+        .baseUrl(API_BASE_URL)
         .addCallAdapterFactory(CoroutineCallAdapterFactory())
         .addConverterFactory(ScalarsConverterFactory.create())
         .addConverterFactory(MoshiConverterFactory.create(moshi))
@@ -45,6 +46,6 @@ object Network {
     val openWeather: ApiOpenWeatherService = retrofit.create(ApiOpenWeatherService::class.java)
 
     fun getImageUrl(icon: String): String {
-        return "$BASE_URL/img/w/$icon.png"
+        return "$BASE_URL/img/wn/$icon@2x.png"
     }
 }

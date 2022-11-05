@@ -4,33 +4,36 @@
             "dev1": {
                 "configuration": {
                     "boiler": {
+                        "automaticActivationEnabled": true,
                         "threshold": 25
                     },
                     "followers": [
                         "lpTnXSx1EnaqnmSnoqOUp5qMeLB2"
                     ],
-                    "lat": 37.427451733780586,
-                    "location": "Lat: 37.42745, Long: -122.08050",
-                    "lon": -122.08050157874823,
-                    "name": "Dev1",
+                    "location": {
+                        "lat": 37.427451733780586,
+                        "location": "Lat: 37.42745, Long: -122.08050",
+                        "lon": -122.08050157874823
+                    },
+                    "name": "AOG",
                     "watering": {
                         "activationHour": 8,
-                        "automaticWateringEnabled": true,
+                        "automaticActivationEnabled": true,
                         "durationMinute": 1,
-                        "frecuencyDay": 1
+                        "frequencyDay": 1
                     }
                 },
                 "id": "dev1",
                 "status": {
                     "esp8266": {
                         "boilerState": false,
-                        "heartbeat": 1667431389,
+                        "heartbeat": 1667611190,
                         "num": 11459,
                         "period": 60,
                         "wateringState": false
                     },
-                    "lastWateringActivation": 1667431271,
-                    "nextWateringActivation": 1,
+                    "lastWateringActivation": 1667604624,
+                    "nextWateringActivation": 1667718000,
                     "outputs": {
                         "boiler": true,
                         "watering": false
@@ -42,7 +45,7 @@
         "users": {
             "lpTnXSx1EnaqnmSnoqOUp5qMeLB2": {
                 "id": "lpTnXSx1EnaqnmSnoqOUp5qMeLB2",
-                "token": "fzxLCEROSKGe_B2U2kxVRK:APA91bFPWTlDcTru8RBKM1g-3Co6Om4HZnGRvoOFg-dGC8gKxSEJGc_QmtlzSc6m7EOq-2EfqDO2SkejjeiuPpy4B93XvnwMZFVf2DgkUYY6poV_zGcePJhi2MbEMkopg3LxDWm8k19t"
+                "token": "ckVq12xWSYK6gz-Ty_OlRz:APA91bGXIdYbAjsKhWTgUJYr6AJ-rP8n2Mq0D9hUL1cfnGKFXYTYpE1DBSUfUr7OC6tOM9UbSZbOsAOH_s0ujqHc4PkwIitgC3ZqDuDUyss2-MyE-PEINrCjn4ky5Dim5hmFZSatNu4z"
             }
         }
     }

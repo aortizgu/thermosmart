@@ -21,6 +21,7 @@
         android:layout_margin="@dimen/padding_medium"
         android:fadeVisible="@{true}"
         android:onClick="@{() -> clickListener.onClick(item)}"
+        android:onLongClick="@{() -> clickListener.onLongClick(item) }"
         app:cardCornerRadius="@dimen/big_radius">
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -34,7 +35,7 @@
                 style="@style/info_text_style"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@{item.name}"
+                android:text="@{item.configuration.name}"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

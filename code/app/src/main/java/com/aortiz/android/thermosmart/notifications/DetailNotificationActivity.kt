@@ -7,7 +7,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import com.aortiz.android.thermosmart.R
 import com.aortiz.android.thermosmart.databinding.ActivityDetailNotificationBinding
-import com.aortiz.android.thermosmart.domain.Thermostat
 import com.aortiz.android.thermosmart.thermostat.detail.ThermostatDetailViewModel
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import org.koin.core.parameter.parametersOf

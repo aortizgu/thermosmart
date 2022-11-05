@@ -1,7 +1,6 @@
 package com.aortiz.android.thermosmart
 
 import android.app.Application
-import android.content.pm.PackageManager
 import android.os.Build
 import androidx.annotation.RequiresApi
 import com.aortiz.android.thermosmart.authentication.AuthenticationViewModel
@@ -9,10 +8,9 @@ import com.aortiz.android.thermosmart.config.AppConfigViewModel
 import com.aortiz.android.thermosmart.database.local.SharedPreferencesDatabase
 import com.aortiz.android.thermosmart.database.realtime.RTDatabase
 import com.aortiz.android.thermosmart.repository.ThermostatRepository
-import com.aortiz.android.thermosmart.thermostat.config.ThermostatConfigViewModel
 import com.aortiz.android.thermosmart.thermostat.detail.ThermostatDetailViewModel
 import com.aortiz.android.thermosmart.thermostat.list.ThermostatListViewModel
-import com.aortiz.android.thermosmart.thermostat.save.ThermostatSaveViewModel
+import com.aortiz.android.thermosmart.thermostat.selectlocation.ThermostatSelectLocationViewModel
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.context.startKoin
@@ -44,12 +42,6 @@ class MyApp : Application() {
                     get()
                 )
             }
-            viewModel {
-                ThermostatSaveViewModel(
-                    get(),
-                    get()
-                )
-            }
             viewModel { parameters ->
                 ThermostatDetailViewModel(
                     get(),
@@ -57,8 +49,8 @@ class MyApp : Application() {
                     parameters.get()
                 )
             }
-            single {
-                ThermostatConfigViewModel(
+            viewModel {
+                ThermostatSelectLocationViewModel(
                     get(),
                     get()
                 )

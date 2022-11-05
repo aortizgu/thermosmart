@@ -1,4 +1,4 @@
-package com.aortiz.android.thermosmart.thermostat.config.selectlocation
+package com.aortiz.android.thermosmart.thermostat.selectlocation
 
 
 import android.Manifest
@@ -17,8 +17,9 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.navigation.fragment.findNavController
 import com.aortiz.android.thermosmart.R
-import com.aortiz.android.thermosmart.databinding.SelectLocationFragmentBinding
-import com.aortiz.android.thermosmart.thermostat.config.ThermostatConfigViewModel
+import com.aortiz.android.thermosmart.databinding.ThermostatSelectLocationFragmentBinding
+import com.aortiz.android.thermosmart.domain.Thermostat
+import com.aortiz.android.thermosmart.utils.ERROR
 import com.aortiz.android.thermosmart.utils.setDisplayHomeAsUpEnabled
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
@@ -29,15 +30,16 @@ import com.google.android.gms.maps.SupportMapFragment
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.Marker
 import com.google.android.gms.maps.model.MarkerOptions
-import org.koin.android.ext.android.inject
+import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
 import java.util.*
 
 
-class SelectLocationFragment : OnMapReadyCallback, Fragment() {
+class ThermostatSelectLocationFragment : OnMapReadyCallback, Fragment() {
 
-    private lateinit var binding: SelectLocationFragmentBinding
-    private val viewModel: ThermostatConfigViewModel by inject()
+    private lateinit var binding: ThermostatSelectLocationFragmentBinding
+    private lateinit var thermostat: Thermostat
+    private val viewModel: ThermostatSelectLocationViewModel by viewModel()
     private lateinit var map: GoogleMap
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     private var marker: Marker? = null
@@ -64,9 +66,12 @@ class SelectLocationFragment : OnMapReadyCallback, Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
-        binding =
-            DataBindingUtil.inflate(inflater, R.layout.select_location_fragment, container, false)
-
+        thermostat =
+            ThermostatSelectLocationFragmentArgs.fromBundle(requireArguments()).thermostat
+        binding = DataBindingUtil.inflate(
+            inflater,
+            R.layout.thermostat_select_location_fragment, container, false
+        )
         binding.viewModel = viewModel
         binding.lifecycleOwner = viewLifecycleOwner
         binding.selectLocationButtonSave.setOnClickListener {
@@ -112,13 +117,56 @@ class SelectLocationFragment : OnMapReadyCallback, Fragment() {
         val mapFragment =
             childFragmentManager.findFragmentById(R.id.selectLocationMapFragment) as SupportMapFragment
         mapFragment.getMapAsync(this)
+        viewModel.saveState.observe(viewLifecycleOwner) {
+            Timber.i("saveState: $it")
+            when (it) {
+                ThermostatSelectLocationViewModel.SaveState.SAVED -> {
+                    viewModel.clearSavedState()
+                    findNavController().popBackStack()
+                }
+                ThermostatSelectLocationViewModel.SaveState.ERROR -> {
+                    viewModel.clearSavedState()
+                }
+                ThermostatSelectLocationViewModel.SaveState.IDLE -> {
+                }
+                null -> {
+                }
+            }
+        }
+        viewModel.errorCode.observe(viewLifecycleOwner) {
+            it?.let {
+                Timber.i("errorCode: $it")
+                val message = when (it) {
+                    ERROR.ALREADY_FOLLOWING -> R.string.already_following
+                    ERROR.INVALID_DEVICE -> R.string.invalid_device
+                    ERROR.INVALID_USER -> R.string.invlid_user
+                    ERROR.NOT_FOLLOWING -> R.string.not_following
+                    else -> R.string.error_adding_thermostat
+                }
+                Toast.makeText(
+                    context,
+                    getString(message),
+                    Toast.LENGTH_SHORT
+                ).show()
+                viewModel.clearError()
+            }
+        }
+
     }
 
     private fun onLocationSelected() {
-        viewModel.latitude.value = selectedLatLng?.latitude
-        viewModel.longitude.value = selectedLatLng?.longitude
-        viewModel.location.value = selectedLocation
-        findNavController().popBackStack()
+        thermostat.id?.let { id ->
+            selectedLatLng?.let { latLng ->
+                selectedLocation?.let { location ->
+                    viewModel.setControllerLocation(
+                        id,
+                        latLng.latitude,
+                        latLng.longitude,
+                        location
+                    )
+                }
+            }
+        }
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
@@ -141,20 +189,21 @@ class SelectLocationFragment : OnMapReadyCallback, Fragment() {
         if (isPermissionGranted()) {
             Timber.d("enableMyLocation: permission granted")
             map.isMyLocationEnabled = true
-            if (!viewModel.location.value.isNullOrEmpty() && !viewModel.location.value.contentEquals(
+            if (!thermostat.configuration.location.location.isNullOrEmpty()
+                && !thermostat.configuration.location.location.contentEquals(
                     "null"
                 )
             ) {
                 val latLng = LatLng(
-                    viewModel.latitude.value ?: defaultLocation.latitude,
-                    viewModel.longitude.value ?: defaultLocation.longitude,
+                    thermostat.configuration.location.latitude ?: defaultLocation.latitude,
+                    thermostat.configuration.location.longitude ?: defaultLocation.longitude,
                 )
                 map.moveCamera(
                     CameraUpdateFactory.newLatLngZoom(
                         latLng, 15f
                     )
                 )
-                setMarker(latLng, viewModel.location.value)
+                setMarker(latLng, thermostat.configuration.location.location)
             } else {
                 getDeviceLocation()
             }

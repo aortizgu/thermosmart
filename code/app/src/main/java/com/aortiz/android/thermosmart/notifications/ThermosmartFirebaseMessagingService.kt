@@ -1,5 +1,6 @@
 package com.aortiz.android.thermosmart.notifications
 
+import com.aortiz.android.thermosmart.R
 import com.aortiz.android.thermosmart.repository.ThermostatRepository
 import com.aortiz.android.thermosmart.utils.OperationResult
 import com.google.android.gms.tasks.OnCompleteListener
@@ -30,18 +31,36 @@ class ThermosmartFirebaseMessagingService : FirebaseMessagingService() {
     }
 
     private fun sendNotification(mutableMap: MutableMap<String, String>) {
-        if (mutableMap.containsKey("title")
-            && mutableMap.containsKey("body")
-            && mutableMap.containsKey("thermostat")
+        if (mutableMap.containsKey("id")
+            && mutableMap.containsKey("name")
+            && mutableMap.containsKey("state")
+            && mutableMap.containsKey("system")
         ) {
-            val title = mutableMap.getOrDefault("title", "")
-            val body = mutableMap.getOrDefault("body", "")
-            val thermostatId = mutableMap.getOrDefault("thermostat", "")
+            val id = mutableMap.getOrDefault("id", "")
+            val name = mutableMap.getOrDefault("name", "")
+            val state = mutableMap.getOrDefault("state", "")
+            val system = mutableMap.getOrDefault("system", "")
+            if (id.isEmpty() || name.isEmpty() || state.isEmpty() || system.isEmpty()) {
+                Timber.e("invalid parameters, cannot be empty")
+                return
+            }
+            if (state != "true" && state != "false") {
+                Timber.e("invalid state parameter $state")
+                return
+            }
+            if (system != "watering" && system != "boiler") {
+                Timber.e("invalid system parameter $system")
+                return
+            }
+            val systemString = if (system=="watering") getString(R.string.watering_system) else getString(R.string.boiler_system)
+            val stateString = if (state=="true") getString(R.string.system_on) else  getString(R.string.system_off)
+            val title = getString(R.string.notification_title, systemString, stateString)
+            val body = getString(R.string.notification_body, systemString, stateString, name)
             sendNotification(
                 applicationContext,
                 title,
                 body,
-                thermostatId
+                id
             )
         } else {
             Timber.e("missing keys received")

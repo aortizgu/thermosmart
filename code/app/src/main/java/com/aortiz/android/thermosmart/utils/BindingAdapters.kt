@@ -1,5 +1,6 @@
 package com.aortiz.android.thermosmart.utils
 
+import android.content.Context
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
@@ -18,6 +19,7 @@ object BindingAdapters {
 
     private object ThermostatRepositoryInstance : KoinComponent {
         val repository: ThermostatRepository by inject()
+        val context: Context by inject()
     }
 
     @BindingAdapter("listData")
@@ -71,20 +73,12 @@ object BindingAdapters {
         textView.text = "${value.format(2)} $units"
     }
 
-    @BindingAdapter("tempText")
-    @JvmStatic
-    fun setTempText(textView: TextView, celsiusValueLiveData: LiveData<Double>) {
-        celsiusValueLiveData.value?.let {
-            setTempText(textView, it)
-        }
-    }
-
     private fun Double.format(digits: Int) = "%.${digits}f".format(this)
 
     @BindingAdapter("goneIfNotNull")
     @JvmStatic
     fun goneIfNotNull(view: View, it: Any?) {
-        view.visibility = if (it != null) View.GONE else View.VISIBLE
+        view.visibility = if (it != null && it != "null") View.GONE else View.VISIBLE
     }
 
     @BindingAdapter("goneIfNull")
@@ -93,15 +87,59 @@ object BindingAdapters {
         view.visibility = if (it == null) View.GONE else View.VISIBLE
     }
 
-
     @BindingAdapter("thermostatStatusImage")
     @JvmStatic
-    fun thermostatStatusImage(imageView: ImageView, active: Boolean) {
-        if (active) {
-            imageView.setImageResource(R.drawable.ic_power_on)
-        } else {
-            imageView.setImageResource(R.drawable.ic_power_off)
+    fun thermostatStatusImage(imageView: ImageView, thermostat: LiveData<Thermostat>) {
+        thermostat.value?.configuration?.boiler?.automaticActivationEnabled?.let { automatic ->
+            thermostat.value?.status?.outputs?.boiler?.let { active ->
+                if (!automatic) {
+                    imageView.setImageResource(R.drawable.ic_power_disabled)
+                } else if (active) {
+                    imageView.setImageResource(R.drawable.ic_power_on)
+                } else {
+                    imageView.setImageResource(R.drawable.ic_power_off)
+                }
+            }
         }
+    }
+
+    @BindingAdapter("wateringStatusImage")
+    @JvmStatic
+    fun wateringStatusImage(imageView: ImageView, thermostat: LiveData<Thermostat>) {
+        thermostat.value?.configuration?.watering?.automaticActivationEnabled?.let { automatic ->
+            thermostat.value?.status?.outputs?.watering?.let { active ->
+                if (active) {
+                    imageView.setImageResource(R.drawable.ic_power_on)
+                } else if (!automatic) {
+                    imageView.setImageResource(R.drawable.ic_power_disabled)
+                } else {
+                    imageView.setImageResource(R.drawable.ic_power_off)
+                }
+            }
+        }
+    }
+
+    @BindingAdapter("wateringFreqText")
+    @JvmStatic
+    fun wateringFreqText(textView: TextView, value: Int) {
+        val values = ThermostatRepositoryInstance.context.resources.getStringArray(R.array.wateringFreq)
+        val valueOffset = value -1
+        textView.text = if (valueOffset >= 0 && valueOffset < values.size) values[valueOffset] else value.toString()
+    }
+
+    @BindingAdapter("wateringDurationText")
+    @JvmStatic
+    fun wateringDurationText(textView: TextView, value: Int) {
+        val values = ThermostatRepositoryInstance.context.resources.getStringArray(R.array.wateringDuration)
+        val valueOffset = value -1
+        textView.text = if (valueOffset >= 0 && valueOffset < values.size) values[valueOffset] else value.toString()
+    }
+
+    @BindingAdapter("wateringTimeText")
+    @JvmStatic
+    fun wateringTimeText(textView: TextView, value: Int) {
+        val values = ThermostatRepositoryInstance.context.resources.getStringArray(R.array.wateringTime)
+        textView.text = if (value >= 0 && value < values.size) values[value] else value.toString()
     }
 
 }

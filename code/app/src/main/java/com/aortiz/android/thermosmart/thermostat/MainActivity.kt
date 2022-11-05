@@ -2,15 +2,26 @@ package com.aortiz.android.thermosmart.thermostat
 
 import android.os.Bundle
 import android.view.MenuItem
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.NavHostFragment
 import com.aortiz.android.thermosmart.R
+import timber.log.Timber
 
 class MainActivity : AppCompatActivity() {
+
+    var firstNavigation = true
+
+    private val pushNotificationPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) {
+        Timber.i("POST_NOTIFICATIONS granted $it")
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        pushNotificationPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -23,5 +34,13 @@ class MainActivity : AppCompatActivity() {
             }
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    fun isFirstNavigation(): Boolean {
+        if (firstNavigation) {
+            firstNavigation = false
+            return true
+        }
+        return false
     }
 }

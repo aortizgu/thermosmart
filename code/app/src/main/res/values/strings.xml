@@ -47,4 +47,82 @@
     <string name="unit_far">ºF</string>
     <string name="location">Location:</string>
     <string name="thermostat_temperature">Temperature: </string>
+    <string name="delete_fragment_dialog_title">Do you want to delete device %1$s?</string>
+    <string name="option_yes">Yes</string>
+    <string name="option_cancel">Cancel</string>
+    <string name="option_no">No</string>
+    <string name="add_fragment_dialog_title">Insert the device id to add</string>
+    <string name="no_location_data">No location data</string>
+    <string name="change_name_fragment_dialog_title">New name for device %1$s:</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="thermostat_change_threshold_dialog_fragment">Set thermostat threshold:</string>
+    <string name="frequency">Frequency:</string>
+    <string name="duration">Duration:</string>
+    <string name="watering_time">Watering time:</string>
+    <string name="freq_hint">1 day</string>
+    <string name="duration_hint">10 minutes</string>
+    <string name="watering_time_hint">8 am</string>
+    <string name="unit_freq">day</string>
+    <string name="unit_freq_plural">days</string>
+    <string name="unit_duration">minute</string>
+    <string name="unit_duration_plural">minutes</string>
+    <string name="start_watering_dialog_title">Do  you want to irrigate now?</string>
+    <string name="watering_system">Watering</string>
+    <string name="boiler_system">Boiler</string>
+    <string name="system_on">activated</string>
+    <string name="system_off">deactivated</string>
+    <string name="notification_title">%1$s %2$s</string>
+    <string name="notification_body">%1$s has been %2$s for device %3$s</string>
+    <string-array name="wateringFreq">
+        <item>1 day</item>
+        <item>2 days</item>
+        <item>3 days</item>
+        <item>4 days</item>
+        <item>5 days</item>
+        <item>6 days</item>
+        <item>7 days</item>
+    </string-array>
+    <string-array name="wateringDuration">
+        <item>1 minute</item>
+        <item>2 minutes</item>
+        <item>3 minutes</item>
+        <item>4 minutes</item>
+        <item>5 minutes</item>
+        <item>6 minutes</item>
+        <item>7 minutes</item>
+        <item>8 minutes</item>
+        <item>9 minutes</item>
+        <item>10 minutes</item>
+        <item>11 minutes</item>
+        <item>12 minutes</item>
+        <item>13 minutes</item>
+        <item>14 minutes</item>
+        <item>15 minutes</item>
+    </string-array>
+    <string-array name="wateringTime">
+        <item>0 am</item>
+        <item>1 am</item>
+        <item>2 am</item>
+        <item>3 am</item>
+        <item>4 am</item>
+        <item>5 am</item>
+        <item>6 am</item>
+        <item>7 am</item>
+        <item>8 am</item>
+        <item>9 am</item>
+        <item>10 am</item>
+        <item>11 am</item>
+        <item>12 am</item>
+        <item>1 pm</item>
+        <item>2 pm</item>
+        <item>3 pm</item>
+        <item>4 pm</item>
+        <item>5 pm</item>
+        <item>6 pm</item>
+        <item>7 pm</item>
+        <item>8 pm</item>
+        <item>9 pm</item>
+        <item>10 pm</item>
+        <item>11 pm</item>
+    </string-array>
 </resources>
