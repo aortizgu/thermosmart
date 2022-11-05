@@ -4,22 +4,17 @@ const admin = require("firebase-admin");
 const logger = require("firebase-functions/logger");
 
 async function getVal(app, ref) {
-
-  var val = undefined;
-
+  let val = undefined;
   await app.database().ref(ref).get().then((snapshot) => {
     val = snapshot.val();
   }).catch((err) => {
     logger.error("getVal: error", err);
   });
-
   return val;
-
 }
 
 async function sendNotification(app, payload, user) {
-
-  logger.info("sendNotification: payload", JSON.stringify(payload), ", user", user);
+ logger.info("sendNotification: payload", JSON.stringify(payload), ", user", user);
 
   const tokenRef = "/root/users/" + user + "/token";
   const token = await getVal(app, tokenRef);
@@ -28,7 +23,7 @@ async function sendNotification(app, payload, user) {
     return;
   }
 
-  var tokenError = undefined;
+  let tokenError = undefined;
   await app.messaging().sendToDevice(token, payload)
     .then((response) => {
       response.results.forEach((result, index) => {
@@ -54,11 +49,9 @@ async function sendNotification(app, payload, user) {
       logger.error("sendNotification: error deleting token", err);
     });
   }
-
 }
 
 async function onActivationChange(app, payload, devId) {
-
   const config = await getVal(app, "/root/devices/" + devId + "/configuration");
   if (config == undefined) {
     logger.error("onActivationChange: invalid config", config);
@@ -68,14 +61,12 @@ async function onActivationChange(app, payload, devId) {
   payload.name = config.name;
 
   for (let index = 0; index < config.followers.length; index++) {
-    const folower = config.followers[index]
+    const folower = config.followers[index];
     await sendNotification(app, payload, folower);
   }
-
 }
 
 async function checkBoilerActivation(app, devId, tempVal, boilerConfig) {
-
   const activeRef = "/root/devices/" + devId + "/status/outputs/boiler";
   const activeVal = await getVal(app, activeRef);
   if (activeVal == undefined) {
@@ -90,7 +81,7 @@ async function checkBoilerActivation(app, devId, tempVal, boilerConfig) {
       needActivation = tempVal < (boilerConfig.threshold + hysteresis);
     } else {
       needActivation = tempVal < (boilerConfig.threshold - hysteresis);
-    }  
+    }
   }
 
   logger.debug("checkBoilerActivation: threshold", boilerConfig.threshold
@@ -113,11 +104,9 @@ async function checkBoilerActivation(app, devId, tempVal, boilerConfig) {
   } else {
     logger.info("checkBoilerActivation: no change needed");
   }
-
 }
 
 async function checkAutomatedActivationNeeded(app, devId) {
-
   const wateringConfigRef = "/root/devices/" + devId + "/configuration/watering";
   const wateringConfig = await getVal(app, wateringConfigRef);
   if (wateringConfig == undefined) {
@@ -143,7 +132,7 @@ async function checkAutomatedActivationNeeded(app, devId) {
     return false;
   }
 
-  let nextDate = new Date();
+  const nextDate = new Date();
   nextDate.setDate(nextDate.getDate() + wateringConfig.frequencyDay);
   nextDate.setHours(wateringConfig.activationHour);
   nextDate.setMinutes(0);
@@ -159,11 +148,9 @@ async function checkAutomatedActivationNeeded(app, devId) {
   });
 
   return true;
-
 }
 
 async function checkWateringActivation(app, devId, lastWateringActivation) {
-
   const activeRef = "/root/devices/" + devId + "/status/outputs/watering";
   const activeVal = await getVal(app, activeRef);
   if (activeVal == undefined) {
@@ -171,7 +158,7 @@ async function checkWateringActivation(app, devId, lastWateringActivation) {
     return;
   }
 
-  const epochNow = Math.round(Date.now() / 1000)
+  const epochNow = Math.round(Date.now() / 1000);
 
   const wateringConfigRef = "/root/devices/" + devId + "/configuration/watering";
   const wateringConfig = await getVal(app, wateringConfigRef);
@@ -190,7 +177,6 @@ async function checkWateringActivation(app, devId, lastWateringActivation) {
     }).catch((err) => {
       logger.error("checkWateringActivation: error setting lastWateringActivation", err);
     });
-
   } else {
     const durationSeconds = wateringConfig.durationMinute * 60;
     const timeSinceLastActivation = epochNow - lastWateringActivation;
@@ -227,7 +213,7 @@ exports.onboilerconfig = functions.database.ref("/root/devices/{devId}/configura
     const app = admin.initializeApp(appOptions, "app");
     const deleteApp = () => app.delete().catch(() => null);
 
-    const tempVal = await getVal(app,  "/root/devices/" + context.params.devId + "/status/temperature");
+    const tempVal = await getVal(app, "/root/devices/" + context.params.devId + "/status/temperature");
     if (tempVal == undefined || isNaN(tempVal)) {
       logger.error("onboilerconfig: invalid tempVal", tempVal);
       return deleteApp();
@@ -245,7 +231,7 @@ exports.onboilertemperature = functions.database.ref("/root/devices/{devId}/stat
     const app = admin.initializeApp(appOptions, "app");
     const deleteApp = () => app.delete().catch(() => null);
 
-    const boilerConfig = await getVal(app,  "/root/devices/" + context.params.devId + "/configuration/boiler");
+    const boilerConfig = await getVal(app, "/root/devices/" + context.params.devId + "/configuration/boiler");
     if (boilerConfig == undefined) {
       logger.error("onboilertemperature: invalid boilerConfig", boilerConfig);
       return deleteApp();
@@ -264,7 +250,7 @@ exports.onlastwateringactivation = functions.database.ref("/root/devices/{devId}
     const deleteApp = () => app.delete().catch(() => null);
 
     if (isNaN(snap.after.val()) || snap.after.val() <= 0) {
-      logger.error("onlastwateringactivation: invalid lastWateringActivation", lastWateringActivation);
+      logger.error("onlastwateringactivation: invalid lastWateringActivation", snap.after.val());
       return deleteApp();
     }
 
@@ -303,7 +289,7 @@ exports.onwateringdeviceactive = functions.database.ref("/root/devices/{devId}/s
       data: {
         id: context.params.devId,
         state: snap.after.val().toString(),
-        system: "watering"
+        system: "watering",
       },
     };
 
@@ -323,7 +309,7 @@ exports.onboilerdeviceactive = functions.database.ref("/root/devices/{devId}/sta
       data: {
         id: context.params.devId,
         state: snap.after.val().toString(),
-        system: "boiler"
+        system: "boiler",
       },
     };
 

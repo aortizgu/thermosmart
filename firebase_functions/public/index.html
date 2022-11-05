@@ -121,9 +121,11 @@
         document.querySelector('#decreasewateringduration').onclick = function () { addVal(wateringDurationPath, -1); };
 
         const esp8266HeartBeatPath = '/root/devices/dev1/status/esp8266/heartbeat'
+        /*      
         setInterval(()=>{
           firebase.database().ref(esp8266HeartBeatPath).set(Math.round(Date.now() / 1000))
         }, 10000);
+        */
         try {
           let app = firebase.app();
           let features = [

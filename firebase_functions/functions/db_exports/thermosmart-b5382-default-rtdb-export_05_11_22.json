@@ -1,0 +1,62 @@
+{
+  "root": {
+    "devices": {
+      "casa_laura_adrian": {
+        "configuration": {
+          "boiler": {
+            "automaticActivationEnabled": false,
+            "threshold": 0
+          },
+          "followers": [
+            "YSreFnZMhxf1KrwfknXtzvLYBFz2",
+            "LrRnYceiGbYLJjAWFNHu0eNyoEd2"
+          ],
+          "location": {
+            "lat": 0,
+            "location": "",
+            "lon": 0
+          },
+          "name": "Casa L&A",
+          "watering": {
+            "activationHour": 1,
+            "automaticActivationEnabled": false,
+            "durationMinute": 1,
+            "frequencyDay": 1
+          }
+        },
+        "id": "casa_laura_adrian",
+        "status": {
+          "active": false,
+          "esp8266": {
+            "boilerState": false,
+            "heartbeat": 948750,
+            "num": 15708,
+            "period": 60,
+            "wateringState": false
+          },
+          "lastWateringActivation": 0,
+          "nextWateringActivation": 0,
+          "outputs": {
+            "boiler": false,
+            "watering": false
+          },
+          "temperature": 21.875
+        }
+      }
+    },
+    "users": {
+      "LrRnYceiGbYLJjAWFNHu0eNyoEd2": {
+        "id": "LrRnYceiGbYLJjAWFNHu0eNyoEd2",
+        "token": "fPnuhqTWQvakNn9WD9gElm:APA91bHui9S3ylr0IUe3Lmdhk7xteUBBFLQoEhYhAE1lB1iUmFB0JHlMwCbOc1TsFEPM7CA6BLULS1tzrArPYCEQSe2ZEwKuQKYwWLdM7F_dbR9Ptk5g7b0cmUhFS0M0_aitX-glKWbc"
+      },
+      "YSreFnZMhxf1KrwfknXtzvLYBFz2": {
+        "id": "YSreFnZMhxf1KrwfknXtzvLYBFz2",
+        "token": "cuaUO5NmQRqCImWvx9xKQR:APA91bHLZBvDArSrNvWiTYl2nYhL3-Du8SNgNEnVGZ4PIJWOn40AR23bX93ewBdv4lCr3NOvHxaCVctVKJ6uxP-rz1cx8SP68-Ss5o9YvTa_9mCgep0PhG_9Zt9tzedcoXaMBb6sczb4"
+      },
+      "lpTnXSx1EnaqnmSnoqOUp5qMeLB2": {
+        "id": "lpTnXSx1EnaqnmSnoqOUp5qMeLB2",
+        "token": "fzxLCEROSKGe_B2U2kxVRK:APA91bFPWTlDcTru8RBKM1g-3Co6Om4HZnGRvoOFg-dGC8gKxSEJGc_QmtlzSc6m7EOq-2EfqDO2SkejjeiuPpy4B93XvnwMZFVf2DgkUYY6poV_zGcePJhi2MbEMkopg3LxDWm8k19t"
+      }
+    }
+  }
+}
