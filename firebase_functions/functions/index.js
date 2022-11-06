@@ -106,32 +106,11 @@ async function checkBoilerActivation(app, devId, tempVal, boilerConfig) {
   }
 }
 
-const getTimeZoneOffsetMins = (date, timeZone) => {
-  // Abuse the Intl API to get a local ISO 8601 string for a given time zone.
-  const options = {
-      timeZone, calendar: "iso8601", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false,
-};
- // @ts-ignore
- const dateTimeFormat = new Intl.DateTimeFormat(undefined, options);
- const parts = dateTimeFormat.formatToParts(date);
- const map = new Map(parts.map((x) => [x.type, x.value]));
- const year = map.get("year");
- const month = map.get("month");
- const day = map.get("day");
- const hour = map.get("hour");
- const minute = map.get("minute");
- const second = map.get("second");
- const ms = date.getMilliseconds().toString().padStart(3, "0");
- const iso = `${year}-${month}-${day}T${hour}:${minute}:${second}.${ms}`;
-
- // Lie to the Date object constructor that it's a UTC time.
- const lie = new Date(`${iso}Z`);
-
- // Return the difference in timestamps, as minutes
- // Positive values are West of GMT, opposite of ISO 8601
- // this matches the output of `Date.getTimeZoneOffset`
- // @ts-ignore
- return -(lie - date) / 60 / 1000;
+const getTimezoneOffsetMins = (timeZone, date = new Date()) => {
+  const tz = date.toLocaleString("en", {timeZone, timeStyle: "long"}).split(" ").slice(-1)[0];
+  const dateString = date.toString();
+  const offset = Date.parse(`${dateString} UTC`) - Date.parse(`${dateString} ${tz}`);
+  return -(offset / 60 / 1000);
 };
 
 function calcTime(d, offsetMins) {
@@ -142,18 +121,18 @@ function calcTime(d, offsetMins) {
 
   // create new Date object for different city
   // using supplied offset
-  return new Date(utc + (60000*offsetMins));
+  return new Date(utc + (60000 * offsetMins));
 }
 
 async function updateNextWateringActivation(app, devId, wateringConfig) {
-  const offsetMadrid = getTimeZoneOffsetMins(new Date(), "Europe/Madrid");
+  const offsetMadrid = getTimezoneOffsetMins("Europe/Madrid");
   const nextDate = new Date();
   nextDate.setDate(nextDate.getDate() + wateringConfig.frequencyDay);
   nextDate.setHours(wateringConfig.activationHour, 0, 0, 0);
   const nextDateTimeMadrid = calcTime(nextDate, offsetMadrid);
   const nextEpochTimeInMadrid = Math.round(nextDateTimeMadrid.getTime() / 1000);
-  const nextWateringActivationRef = "/root/devices/" + devId + "/status/nextWateringActivation";
 
+  const nextWateringActivationRef = "/root/devices/" + devId + "/status/nextWateringActivation";
   await app.database().ref(nextWateringActivationRef).set(nextEpochTimeInMadrid).then(() => {
     logger.info("updateNextWateringActivation: updated next activation time,", nextEpochTimeInMadrid);
   }).catch((err) => {
@@ -246,12 +225,12 @@ async function checkWateringActivation(app, devId, lastWateringActivation) {
   }
 }
 
-exports.onboilerconfig = functions.database.ref("/root/devices/{devId}/configuration/boiler")
+exports.onboilerconfig = functions.region("europe-west1").database.ref("/root/devices/{devId}/configuration/boiler")
   .onUpdate(async (snap, context) => {
     logger.info("onboilerconfig: change in device", context.params.devId, "boiler config from", JSON.stringify(snap.before.val()), "to", JSON.stringify(snap.after.val()));
     const appOptions = JSON.parse(process.env.FIREBASE_CONFIG);
     appOptions.databaseAuthVariableOverride = context.auth;
-    const app = admin.initializeApp(appOptions, "app");
+    const app = admin.initializeApp(appOptions);
     const deleteApp = () => app.delete().catch(() => null);
 
     const tempVal = await getVal(app, "/root/devices/" + context.params.devId + "/status/temperature");
@@ -264,12 +243,12 @@ exports.onboilerconfig = functions.database.ref("/root/devices/{devId}/configura
     return deleteApp();
   });
 
-exports.onboilertemperature = functions.database.ref("/root/devices/{devId}/status/temperature")
+exports.onboilertemperature = functions.region("europe-west1").database.ref("/root/devices/{devId}/status/temperature")
   .onUpdate(async (snap, context) => {
     logger.info("onboilertemperature: change in device", context.params.devId, "temperature from", snap.before.val(), "to", snap.after.val());
     const appOptions = JSON.parse(process.env.FIREBASE_CONFIG);
     appOptions.databaseAuthVariableOverride = context.auth;
-    const app = admin.initializeApp(appOptions, "app");
+    const app = admin.initializeApp(appOptions);
     const deleteApp = () => app.delete().catch(() => null);
 
     const boilerConfig = await getVal(app, "/root/devices/" + context.params.devId + "/configuration/boiler");
@@ -282,13 +261,13 @@ exports.onboilertemperature = functions.database.ref("/root/devices/{devId}/stat
     return deleteApp();
   });
 
-exports.onwateringconfig = functions.database.ref("/root/devices/{devId}/configuration/watering")
+exports.onwateringconfig = functions.region("europe-west1").database.ref("/root/devices/{devId}/configuration/watering")
   .onUpdate(async (snap, context) => {
     logger.info("onboilerconfig: change in device", context.params.devId, "wagtering config from", JSON.stringify(snap.before.val()), "to", JSON.stringify(snap.after.val()));
     const appOptions = JSON.parse(process.env.FIREBASE_CONFIG);
     appOptions.databaseAuthVariableOverride = context.auth;
 
-    const app = admin.initializeApp(appOptions, "app");
+    const app = admin.initializeApp(appOptions);
     const deleteApp = () => app.delete().catch(() => null);
 
     if (snap.after.val().automaticActivationEnabled) {
@@ -297,12 +276,12 @@ exports.onwateringconfig = functions.database.ref("/root/devices/{devId}/configu
     return deleteApp();
   });
 
-exports.onlastwateringactivation = functions.database.ref("/root/devices/{devId}/status/lastWateringActivation")
+exports.onlastwateringactivation = functions.region("europe-west1").database.ref("/root/devices/{devId}/status/lastWateringActivation")
   .onUpdate(async (snap, context) => {
     logger.info("onlastwateringactivation: change in device", context.params.devId, "lastWateringActivation from", snap.before.val(), "to", snap.after.val());
     const appOptions = JSON.parse(process.env.FIREBASE_CONFIG);
     appOptions.databaseAuthVariableOverride = context.auth;
-    const app = admin.initializeApp(appOptions, "app");
+    const app = admin.initializeApp(appOptions);
     const deleteApp = () => app.delete().catch(() => null);
 
     if (isNaN(snap.after.val()) || snap.after.val() <= 0) {
@@ -314,12 +293,12 @@ exports.onlastwateringactivation = functions.database.ref("/root/devices/{devId}
     return deleteApp();
   });
 
-exports.onheartbeat = functions.database.ref("/root/devices/{devId}/status/esp8266/heartbeat")
+exports.onheartbeat = functions.region("europe-west1").database.ref("/root/devices/{devId}/status/esp8266/heartbeat")
   .onUpdate(async (snap, context) => {
     logger.info("onHeartBeat: change in device", context.params.devId, "heartbeat from", snap.before.val(), "to", snap.after.val());
     const appOptions = JSON.parse(process.env.FIREBASE_CONFIG);
     appOptions.databaseAuthVariableOverride = context.auth;
-    const app = admin.initializeApp(appOptions, "app");
+    const app = admin.initializeApp(appOptions);
     const deleteApp = () => app.delete().catch(() => null);
 
     const lastWateringActivationRef = "/root/devices/" + context.params.devId + "/status/lastWateringActivation";
@@ -333,12 +312,12 @@ exports.onheartbeat = functions.database.ref("/root/devices/{devId}/status/esp82
     return deleteApp();
   });
 
-exports.onwateringdeviceactive = functions.database.ref("/root/devices/{devId}/status/outputs/watering")
+exports.onwateringdeviceactive = functions.region("europe-west1").database.ref("/root/devices/{devId}/status/outputs/watering")
   .onUpdate(async (snap, context) => {
     logger.info("onwateringdeviceactive: change in device", context.params.devId, "output watering from", snap.before.val(), "to", snap.after.val());
     const appOptions = JSON.parse(process.env.FIREBASE_CONFIG);
     appOptions.databaseAuthVariableOverride = context.auth;
-    const app = admin.initializeApp(appOptions, "app");
+    const app = admin.initializeApp(appOptions);
     const deleteApp = () => app.delete().catch(() => null);
 
     const payload = {
@@ -353,12 +332,12 @@ exports.onwateringdeviceactive = functions.database.ref("/root/devices/{devId}/s
     return deleteApp();
   });
 
-exports.onboilerdeviceactive = functions.database.ref("/root/devices/{devId}/status/outputs/boiler")
+exports.onboilerdeviceactive = functions.region("europe-west1").database.ref("/root/devices/{devId}/status/outputs/boiler")
   .onUpdate(async (snap, context) => {
     logger.info("onboilerdeviceactive: change in device", context.params.devId, "output boiler from", snap.before.val(), "to", snap.after.val());
     const appOptions = JSON.parse(process.env.FIREBASE_CONFIG);
     appOptions.databaseAuthVariableOverride = context.auth;
-    const app = admin.initializeApp(appOptions, "app");
+    const app = admin.initializeApp(appOptions);
     const deleteApp = () => app.delete().catch(() => null);
 
     const payload = {
