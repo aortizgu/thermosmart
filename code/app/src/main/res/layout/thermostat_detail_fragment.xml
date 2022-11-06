@@ -276,12 +276,10 @@
                     android:id="@+id/wateringStateImageView"
                     android:layout_width="58dp"
                     android:layout_height="47dp"
-                    android:layout_marginTop="36dp"
                     android:layout_marginEnd="8dp"
                     android:layout_marginBottom="8dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/switchWateringAutomaticActivation"
                     app:wateringStatusImage="@{viewModel.thermostat}"
                     tools:src="@drawable/ic_power_off" />
 
@@ -291,7 +289,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="16dp"
-                    android:layout_marginBottom="16dp"
+                    android:layout_marginBottom="8dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/wateringImageViewTopLeftIcon">
@@ -356,6 +354,50 @@
                         app:layout_constraintBaseline_toBaselineOf="@+id/wateringTimeTextView"
                         app:layout_constraintStart_toEndOf="@+id/wateringTimeTextView"
                         app:wateringTimeText="@{viewModel.thermostat.configuration.watering.activationHour}"
+                        tools:text="8 am" />
+
+                    <TextView
+                        android:id="@+id/lastWateringTextView"
+                        style="@style/data_text_style"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="@string/last_watering_time"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/wateringTimeTextView" />
+
+                    <TextView
+                        android:id="@+id/lastWateringValTextView"
+                        style="@style/data_text_style"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        app:epochToLocalDate="@{viewModel.thermostat.status.lastWateringActivation}"
+                        app:layout_constraintBaseline_toBaselineOf="@+id/lastWateringTextView"
+                        app:layout_constraintStart_toEndOf="@+id/lastWateringTextView"
+                        tools:text="8 am" />
+
+                    <TextView
+                        android:id="@+id/nextWateringTextView"
+                        style="@style/data_text_style"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        android:text="@string/next_watering_time"
+                        app:goneIfNot="@{viewModel.thermostat.configuration.watering.automaticActivationEnabled}"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toBottomOf="@+id/lastWateringTextView" />
+
+                    <TextView
+                        android:id="@+id/nextWateringValTextView"
+                        style="@style/data_text_style"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        app:epochToLocalDate="@{viewModel.thermostat.status.nextWateringActivation}"
+                        app:goneIfNot="@{viewModel.thermostat.configuration.watering.automaticActivationEnabled}"
+                        app:layout_constraintBaseline_toBaselineOf="@+id/nextWateringTextView"
+                        app:layout_constraintStart_toEndOf="@+id/nextWateringTextView"
                         tools:text="8 am" />
                 </androidx.constraintlayout.widget.ConstraintLayout>
 

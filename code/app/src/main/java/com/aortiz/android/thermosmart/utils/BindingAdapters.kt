@@ -14,6 +14,9 @@ import com.aortiz.android.thermosmart.thermostat.list.ThermostatAdapter
 import com.squareup.picasso.Picasso
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
 object BindingAdapters {
 
@@ -122,24 +125,44 @@ object BindingAdapters {
     @BindingAdapter("wateringFreqText")
     @JvmStatic
     fun wateringFreqText(textView: TextView, value: Int) {
-        val values = ThermostatRepositoryInstance.context.resources.getStringArray(R.array.wateringFreq)
-        val valueOffset = value -1
-        textView.text = if (valueOffset >= 0 && valueOffset < values.size) values[valueOffset] else value.toString()
+        val values =
+            ThermostatRepositoryInstance.context.resources.getStringArray(R.array.wateringFreq)
+        val valueOffset = value - 1
+        textView.text =
+            if (valueOffset >= 0 && valueOffset < values.size) values[valueOffset] else value.toString()
     }
 
     @BindingAdapter("wateringDurationText")
     @JvmStatic
     fun wateringDurationText(textView: TextView, value: Int) {
-        val values = ThermostatRepositoryInstance.context.resources.getStringArray(R.array.wateringDuration)
-        val valueOffset = value -1
-        textView.text = if (valueOffset >= 0 && valueOffset < values.size) values[valueOffset] else value.toString()
+        val values =
+            ThermostatRepositoryInstance.context.resources.getStringArray(R.array.wateringDuration)
+        val valueOffset = value - 1
+        textView.text =
+            if (valueOffset >= 0 && valueOffset < values.size) values[valueOffset] else value.toString()
     }
 
     @BindingAdapter("wateringTimeText")
     @JvmStatic
     fun wateringTimeText(textView: TextView, value: Int) {
-        val values = ThermostatRepositoryInstance.context.resources.getStringArray(R.array.wateringTime)
+        val values =
+            ThermostatRepositoryInstance.context.resources.getStringArray(R.array.wateringTime)
         textView.text = if (value >= 0 && value < values.size) values[value] else value.toString()
+    }
+
+    @BindingAdapter("epochToLocalDate")
+    @JvmStatic
+    fun epochToLocalDate(textView: TextView, value: Int) {
+        val dt = Instant.ofEpochSecond(value.toLong())
+            .atZone(ZoneId.systemDefault())
+            .toLocalDateTime()
+        textView.text = dt.format(DateTimeFormatter.ofPattern(" KK:mm a EEE LLL"))
+    }
+
+    @BindingAdapter("goneIfNot")
+    @JvmStatic
+    fun goneIfNot(textView: TextView, value: Boolean) {
+        textView.visibility = if (value) View.VISIBLE else View.GONE
     }
 
 }

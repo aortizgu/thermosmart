@@ -17,8 +17,8 @@ import timber.log.Timber
 class RTDatabase(context: Context) {
 
     private var database: FirebaseDatabase =
-        //Firebase.database(context.getString(R.string.db_url))
-        Firebase.database(context.getString(R.string.emulator_db_url))
+        Firebase.database(context.getString(R.string.db_url))
+        //Firebase.database(context.getString(R.string.emulator_db_url))
 
     companion object {
         const val ROOT_REFERENCE = "root"

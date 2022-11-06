@@ -14,7 +14,7 @@ async function getVal(app, ref) {
 }
 
 async function sendNotification(app, payload, user) {
- logger.info("sendNotification: payload", JSON.stringify(payload), ", user", user);
+  logger.info("sendNotification: payload", JSON.stringify(payload), ", user", user);
 
   const tokenRef = "/root/users/" + user + "/token";
   const token = await getVal(app, tokenRef);
@@ -106,6 +106,61 @@ async function checkBoilerActivation(app, devId, tempVal, boilerConfig) {
   }
 }
 
+const getTimeZoneOffsetMins = (date, timeZone) => {
+  // Abuse the Intl API to get a local ISO 8601 string for a given time zone.
+  const options = {
+      timeZone, calendar: "iso8601", year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false,
+};
+ // @ts-ignore
+ const dateTimeFormat = new Intl.DateTimeFormat(undefined, options);
+ const parts = dateTimeFormat.formatToParts(date);
+ const map = new Map(parts.map((x) => [x.type, x.value]));
+ const year = map.get("year");
+ const month = map.get("month");
+ const day = map.get("day");
+ const hour = map.get("hour");
+ const minute = map.get("minute");
+ const second = map.get("second");
+ const ms = date.getMilliseconds().toString().padStart(3, "0");
+ const iso = `${year}-${month}-${day}T${hour}:${minute}:${second}.${ms}`;
+
+ // Lie to the Date object constructor that it's a UTC time.
+ const lie = new Date(`${iso}Z`);
+
+ // Return the difference in timestamps, as minutes
+ // Positive values are West of GMT, opposite of ISO 8601
+ // this matches the output of `Date.getTimeZoneOffset`
+ // @ts-ignore
+ return -(lie - date) / 60 / 1000;
+};
+
+function calcTime(d, offsetMins) {
+  // convert to msec
+  // subtract local time zone offset
+  // get UTC time in msec
+  const utc = d.getTime() + (d.getTimezoneOffset() * 60000);
+
+  // create new Date object for different city
+  // using supplied offset
+  return new Date(utc + (60000*offsetMins));
+}
+
+async function updateNextWateringActivation(app, devId, wateringConfig) {
+  const offsetMadrid = getTimeZoneOffsetMins(new Date(), "Europe/Madrid");
+  const nextDate = new Date();
+  nextDate.setDate(nextDate.getDate() + wateringConfig.frequencyDay);
+  nextDate.setHours(wateringConfig.activationHour, 0, 0, 0);
+  const nextDateTimeMadrid = calcTime(nextDate, offsetMadrid);
+  const nextEpochTimeInMadrid = Math.round(nextDateTimeMadrid.getTime() / 1000);
+  const nextWateringActivationRef = "/root/devices/" + devId + "/status/nextWateringActivation";
+
+  await app.database().ref(nextWateringActivationRef).set(nextEpochTimeInMadrid).then(() => {
+    logger.info("updateNextWateringActivation: updated next activation time,", nextEpochTimeInMadrid);
+  }).catch((err) => {
+    logger.error("updateNextWateringActivation: error", err);
+  });
+}
+
 async function checkAutomatedActivationNeeded(app, devId) {
   const wateringConfigRef = "/root/devices/" + devId + "/configuration/watering";
   const wateringConfig = await getVal(app, wateringConfigRef);
@@ -132,21 +187,7 @@ async function checkAutomatedActivationNeeded(app, devId) {
     return false;
   }
 
-  const nextDate = new Date();
-  nextDate.setDate(nextDate.getDate() + wateringConfig.frequencyDay);
-  nextDate.setHours(wateringConfig.activationHour);
-  nextDate.setMinutes(0);
-  nextDate.setSeconds(0);
-  nextDate.setMilliseconds(0);
-  const nextEpochTime = Math.round(nextDate.getTime() / 1000);
-  logger.info("onwateringdeviceactive: updating next activation time, ", nextEpochTime);
-
-  await app.database().ref(nextWateringActivationRef).set(nextEpochTime).then(() => {
-    logger.info("onwateringdeviceactive: updated next activation time, ", nextEpochTime);
-  }).catch((err) => {
-    logger.error("onwateringdeviceactive: error", err);
-  });
-
+  await updateNextWateringActivation(wateringConfig);
   return true;
 }
 
@@ -238,6 +279,21 @@ exports.onboilertemperature = functions.database.ref("/root/devices/{devId}/stat
     }
 
     await checkBoilerActivation(app, context.params.devId, snap.after.val(), boilerConfig);
+    return deleteApp();
+  });
+
+exports.onwateringconfig = functions.database.ref("/root/devices/{devId}/configuration/watering")
+  .onUpdate(async (snap, context) => {
+    logger.info("onboilerconfig: change in device", context.params.devId, "wagtering config from", JSON.stringify(snap.before.val()), "to", JSON.stringify(snap.after.val()));
+    const appOptions = JSON.parse(process.env.FIREBASE_CONFIG);
+    appOptions.databaseAuthVariableOverride = context.auth;
+
+    const app = admin.initializeApp(appOptions, "app");
+    const deleteApp = () => app.delete().catch(() => null);
+
+    if (snap.after.val().automaticActivationEnabled) {
+      await updateNextWateringActivation(app, context.params.devId, snap.after.val());
+    }
     return deleteApp();
   });
 

@@ -73,6 +73,8 @@
     <string name="system_off">deactivated</string>
     <string name="notification_title">%1$s %2$s</string>
     <string name="notification_body">%1$s has been %2$s for device %3$s</string>
+    <string name="last_watering_time">Last: </string>
+    <string name="next_watering_time">Next: </string>
     <string-array name="wateringFreq">
         <item>1 day</item>
         <item>2 days</item>

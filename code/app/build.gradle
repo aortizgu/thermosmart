@@ -15,8 +15,8 @@ android {
         applicationId "com.aortiz.android.thermosmart"
         minSdkVersion rootProject.minSdkVersion
         targetSdkVersion rootProject.targetSdkVersion
-        versionCode 2
-        versionName "2.0"
+        versionCode 3
+        versionName "3.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
         buildConfigField "String", "OPEN_WEATHER_API_KEY",localProperties['OPEN_WEATHER_API_KEY']

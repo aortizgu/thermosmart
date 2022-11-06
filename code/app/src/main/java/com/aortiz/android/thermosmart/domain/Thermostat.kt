@@ -79,8 +79,8 @@ class Thermostat(
     class Status(
         private var esp8266: ESP8266,
         var outputs: Outputs,
-        private var lastWateringActivation: Int?,
-        private var nextWateringActivation: Int?,
+        var lastWateringActivation: Int?,
+        var nextWateringActivation: Int?,
         var temperature: Double?
     ) : Parcelable {
         fun asDBThermostatStatus(): DBThermostatStatus {
