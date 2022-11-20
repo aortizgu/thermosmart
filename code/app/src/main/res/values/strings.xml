@@ -1,30 +1,16 @@
 <resources>
-    <string name="app_name">thermosmart</string>
+    <string name="app_name">smarthome</string>
     <string name="action_settings">Settings</string>
-    <!-- Strings used for fragments for navigation -->
-    <string name="first_fragment_label">First Fragment</string>
-    <string name="second_fragment_label">Second Fragment</string>
-    <string name="next">Next</string>
-    <string name="previous">Previous</string>
 
-    <string name="hello_first_fragment">Hello first fragment</string>
-    <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
     <string name="login">Login</string>
     <string name="action_logout">Logout</string>
     <string name="save">Save</string>
-    <string name="insert_thermostat_id">Thermostat Id</string>
-    <string name="thermostat_name_hint">Thermostat Name</string>
     <string name="thermostat_id">Id: </string>
     <string name="thermostat_name">Name: </string>
-    <string name="thermostat_location">Select location</string>
-    <string name="show_in_fahrenheit_key">show_in_fahrenheit_key</string>
-    <string name="shared_preferences">shared_preferences</string>
+    <string name="show_in_fahrenheit_key" translatable="false">show_in_fahrenheit_key</string>
+    <string name="shared_preferences" translatable="false">shared_preferences</string>
     <string name="units">Set temperature units: </string>
-    <string name="action_remove">Remove</string>
-    <string name="exterior">Exterior</string>
-    <string name="thermostat_state">State: </string>
     <string name="thermostat_threshold">Threshold: </string>
-    <string name="config_threshold">Threshold: </string>
     <string name="dropped_pin">Thermostat Location</string>
     <bool name="show_in_fahrenheit">false</bool>
     <string name="normal_map">Normal Map</string>
@@ -32,49 +18,40 @@
     <string name="satellite_map">Satellite Map</string>
     <string name="terrain_map">Terrain Map</string>
 
-    <string name="emulator_db_url">http://10.0.2.2:9000/?ns=thermosmart-b5382-default-rtdb</string>
-    <string name="db_url">https://thermosmart-b5382-default-rtdb.europe-west1.firebasedatabase.app</string>
+    <string name="db_url" translatable="false">https://thermosmart-b5382-default-rtdb.europe-west1.firebasedatabase.app</string>
     <string name="permission_denied_explanation">You need to grant location permission in order to select the location.</string>
     <string name="error_adding_thermostat">Error adding thermostat</string>
-    <string name="error_removing_thermostat">Error removing thermostat</string>
     <string name="already_following">Already following device</string>
     <string name="invalid_device">Invalid device</string>
     <string name="invlid_user">Invalid User</string>
     <string name="not_following">Not following</string>
-    <string name="default_notification_channel_id">com.google.firebase.messaging.default_notification_channel_id_0</string>
-    <string name="insert_device_id">Insert a valid thermostat ID</string>
-    <string name="unit_cels">º C</string>
-    <string name="unit_far">ºF</string>
-    <string name="location">Location:</string>
+    <string name="unit_cels" translatable="false">º C</string>
+    <string name="unit_far" translatable="false">ºF</string>
     <string name="thermostat_temperature">Temperature: </string>
     <string name="delete_fragment_dialog_title">Do you want to delete device %1$s?</string>
     <string name="option_yes">Yes</string>
-    <string name="option_cancel">Cancel</string>
     <string name="option_no">No</string>
-    <string name="add_fragment_dialog_title">Insert the device id to add</string>
     <string name="no_location_data">No location data</string>
     <string name="change_name_fragment_dialog_title">New name for device %1$s:</string>
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="thermostat_change_threshold_dialog_fragment">Set thermostat threshold:</string>
     <string name="frequency">Frequency:</string>
     <string name="duration">Duration:</string>
     <string name="watering_time">Watering time:</string>
-    <string name="freq_hint">1 day</string>
-    <string name="duration_hint">10 minutes</string>
-    <string name="watering_time_hint">8 am</string>
-    <string name="unit_freq">day</string>
-    <string name="unit_freq_plural">days</string>
-    <string name="unit_duration">minute</string>
-    <string name="unit_duration_plural">minutes</string>
     <string name="start_watering_dialog_title">Do  you want to irrigate now?</string>
     <string name="watering_system">Watering</string>
     <string name="boiler_system">Boiler</string>
-    <string name="system_on">activated</string>
-    <string name="system_off">deactivated</string>
-    <string name="notification_title">%1$s %2$s</string>
-    <string name="notification_body">%1$s has been %2$s for device %3$s</string>
-    <string name="last_watering_time">Last: </string>
-    <string name="next_watering_time">Next: </string>
+    <string name="system_on_m">activated</string>
+    <string name="system_off_m">deactivated</string>
+    <string name="system_on_f">activated</string>
+    <string name="system_off_f">deactivated</string>
+    <string name="notification_title" translatable="false">%1$s %2$s</string>
+    <string name="notification_body_boiler_active">Boiler has been activated for device %1$s</string>
+    <string name="notification_body_boiler_inactive">Boiler has been deactivated for device %1$s</string>
+    <string name="notification_body_watering_active">Watering has been activated for device %1$s</string>
+    <string name="notification_body_watering_inactive">Watering has been deactivated for device %1$s</string>
+    <string name="last_watering_time">Last:</string>
+    <string name="next_watering_time">Next:</string>
+    <string name="watering_config_title_dialog">Configure automatic watering:</string>
     <string-array name="wateringFreq">
         <item>1 day</item>
         <item>2 days</item>

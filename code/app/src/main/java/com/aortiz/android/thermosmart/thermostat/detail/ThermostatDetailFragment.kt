@@ -11,8 +11,6 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.aortiz.android.thermosmart.R
 import com.aortiz.android.thermosmart.databinding.ThermostatDetailFragmentBinding
-import com.aortiz.android.thermosmart.notifications.DetailNotificationActivity
-import com.aortiz.android.thermosmart.notifications.NotificationActivity
 import com.aortiz.android.thermosmart.utils.ERROR
 import com.aortiz.android.thermosmart.utils.setDisplayHomeAsUpEnabled
 import org.koin.android.ext.android.inject

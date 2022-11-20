@@ -43,7 +43,7 @@ class AuthenticationActivity : AppCompatActivity() {
                 .setAvailableProviders(
                     arrayListOf(
                         AuthUI.IdpConfig.EmailBuilder().build(),
-                        AuthUI.IdpConfig.GoogleBuilder().build()
+                        //AuthUI.IdpConfig.GoogleBuilder().build()
                     )
                 )
                 .setIsSmartLockEnabled(false)

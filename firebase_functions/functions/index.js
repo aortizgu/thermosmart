@@ -19,7 +19,7 @@ async function sendNotification(app, payload, user) {
   const tokenRef = "/root/users/" + user + "/token";
   const token = await getVal(app, tokenRef);
   if (token == undefined || !token) {
-    logger.error("sendNotification: invalid token", token);
+    logger.warn("sendNotification: invalid token");
     return;
   }
 
@@ -38,11 +38,11 @@ async function sendNotification(app, payload, user) {
         }
       });
     }).catch((err) => {
-      logger.error("sendNotification: error when sending notification to ", token, " error ", err);
+      logger.warn("sendNotification: error when sending notification to ", token, " error ", err);
     });
 
   if (tokenError != undefined && tokenError) {
-    logger.error("sendNotification: invalid token", token);
+    logger.warn("sendNotification: invalid token", token);
     await app.database().ref(tokenRef).remove().then(() => {
       logger.info("sendNotification: deleted token", token);
     }).catch((err) => {
@@ -54,11 +54,11 @@ async function sendNotification(app, payload, user) {
 async function onActivationChange(app, payload, devId) {
   const config = await getVal(app, "/root/devices/" + devId + "/configuration");
   if (config == undefined) {
-    logger.error("onActivationChange: invalid config", config);
+    logger.error("onActivationChange: invalid config");
     return;
   }
 
-  payload.name = config.name;
+  payload.data.name = config.name;
 
   for (let index = 0; index < config.followers.length; index++) {
     const folower = config.followers[index];
@@ -70,7 +70,7 @@ async function checkBoilerActivation(app, devId, tempVal, boilerConfig) {
   const activeRef = "/root/devices/" + devId + "/status/outputs/boiler";
   const activeVal = await getVal(app, activeRef);
   if (activeVal == undefined) {
-    logger.error("checkBoilerActivation: invalid activeVal", activeVal);
+    logger.error("checkBoilerActivation: invalid activeVal");
     return;
   }
 
@@ -144,7 +144,7 @@ async function checkAutomatedActivationNeeded(app, devId) {
   const wateringConfigRef = "/root/devices/" + devId + "/configuration/watering";
   const wateringConfig = await getVal(app, wateringConfigRef);
   if (wateringConfig == undefined) {
-    logger.error("checkAutomatedActivationNeeded: invalid wateringConfig", wateringConfig);
+    logger.error("checkAutomatedActivationNeeded: invalid wateringConfig");
     return false;
   }
 
@@ -156,7 +156,7 @@ async function checkAutomatedActivationNeeded(app, devId) {
   const nextWateringActivationRef = "/root/devices/" + devId + "/status/nextWateringActivation";
   const nextWateringActivation = await getVal(app, nextWateringActivationRef);
   if (nextWateringActivation == undefined || isNaN(nextWateringActivation)) {
-    logger.error("checkAutomatedActivationNeeded: invalid nextWateringActivation", nextWateringActivation);
+    logger.error("checkAutomatedActivationNeeded: invalid nextWateringActivation");
     return false;
   }
 
@@ -166,7 +166,7 @@ async function checkAutomatedActivationNeeded(app, devId) {
     return false;
   }
 
-  await updateNextWateringActivation(wateringConfig);
+  await updateNextWateringActivation(app, devId, wateringConfig);
   return true;
 }
 
@@ -174,7 +174,7 @@ async function checkWateringActivation(app, devId, lastWateringActivation) {
   const activeRef = "/root/devices/" + devId + "/status/outputs/watering";
   const activeVal = await getVal(app, activeRef);
   if (activeVal == undefined) {
-    logger.error("checkWateringActivation: invalid activeVal", activeVal);
+    logger.error("checkWateringActivation: invalid activeVal");
     return;
   }
 
@@ -183,7 +183,7 @@ async function checkWateringActivation(app, devId, lastWateringActivation) {
   const wateringConfigRef = "/root/devices/" + devId + "/configuration/watering";
   const wateringConfig = await getVal(app, wateringConfigRef);
   if (wateringConfig == undefined) {
-    logger.error("checkAutomatedActivationNeeded: invalid wateringConfig", wateringConfig);
+    logger.error("checkAutomatedActivationNeeded: invalid wateringConfig");
     return;
   }
 
@@ -235,7 +235,7 @@ exports.onboilerconfig = functions.region("europe-west1").database.ref("/root/de
 
     const tempVal = await getVal(app, "/root/devices/" + context.params.devId + "/status/temperature");
     if (tempVal == undefined || isNaN(tempVal)) {
-      logger.error("onboilerconfig: invalid tempVal", tempVal);
+      logger.error("onboilerconfig: invalid tempVal");
       return deleteApp();
     }
 
@@ -253,7 +253,7 @@ exports.onboilertemperature = functions.region("europe-west1").database.ref("/ro
 
     const boilerConfig = await getVal(app, "/root/devices/" + context.params.devId + "/configuration/boiler");
     if (boilerConfig == undefined) {
-      logger.error("onboilertemperature: invalid boilerConfig", boilerConfig);
+      logger.error("onboilertemperature: invalid boilerConfig");
       return deleteApp();
     }
 
@@ -285,7 +285,7 @@ exports.onlastwateringactivation = functions.region("europe-west1").database.ref
     const deleteApp = () => app.delete().catch(() => null);
 
     if (isNaN(snap.after.val()) || snap.after.val() <= 0) {
-      logger.error("onlastwateringactivation: invalid lastWateringActivation", snap.after.val());
+      logger.error("onlastwateringactivation: invalid lastWateringActivation");
       return deleteApp();
     }
 
@@ -304,7 +304,7 @@ exports.onheartbeat = functions.region("europe-west1").database.ref("/root/devic
     const lastWateringActivationRef = "/root/devices/" + context.params.devId + "/status/lastWateringActivation";
     const lastWateringActivation = await getVal(app, lastWateringActivationRef);
     if (isNaN(lastWateringActivation) || lastWateringActivation <= 0) {
-      logger.error("onHeartBeat: invalid lastWateringActivation", lastWateringActivation);
+      logger.error("onHeartBeat: invalid lastWateringActivation");
       return deleteApp();
     }
 

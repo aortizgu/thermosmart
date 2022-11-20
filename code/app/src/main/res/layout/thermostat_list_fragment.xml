@@ -33,6 +33,7 @@
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/margin_normal"
             android:src="@drawable/ic_add"
+            app:backgroundTint="@color/md_theme_light_primary"
             app:fabSize="normal"
             app:layout_anchor="@id/thermostatRecyclerView"
             app:layout_anchorGravity="bottom|right|end"

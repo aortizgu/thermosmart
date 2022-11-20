@@ -52,10 +52,25 @@ class ThermosmartFirebaseMessagingService : FirebaseMessagingService() {
                 Timber.e("invalid system parameter $system")
                 return
             }
-            val systemString = if (system=="watering") getString(R.string.watering_system) else getString(R.string.boiler_system)
-            val stateString = if (state=="true") getString(R.string.system_on) else  getString(R.string.system_off)
+            val systemString =
+                if (system == "watering") getString(R.string.watering_system) else getString(R.string.boiler_system)
+            val stateString = if (system == "watering") {
+                if (state == "true") getString(R.string.system_on_m) else getString(R.string.system_off_m)
+            } else {
+                if (state == "true") getString(R.string.system_on_f) else getString(R.string.system_off_f)
+            }
             val title = getString(R.string.notification_title, systemString, stateString)
-            val body = getString(R.string.notification_body, systemString, stateString, name)
+            val body = if (system == "watering") {
+                if (state == "true") getString(
+                    R.string.notification_body_watering_active,
+                    name
+                ) else getString(R.string.notification_body_watering_inactive, name)
+            } else {
+                if (state == "true") getString(
+                    R.string.notification_body_boiler_active,
+                    name
+                ) else getString(R.string.notification_body_boiler_inactive, name)
+            }
             sendNotification(
                 applicationContext,
                 title,

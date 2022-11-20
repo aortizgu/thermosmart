@@ -27,7 +27,7 @@ class ThermostatWateringConfigDialog(
         _binding =
             ThermostatWateringConfigDialogFragmentBinding.inflate(LayoutInflater.from(context))
         return AlertDialog.Builder(requireActivity())
-            .setTitle("Configure automatic watering")
+            .setTitle(getString(R.string.watering_config_title_dialog))
             .setView(binding.root)
             .create()
     }

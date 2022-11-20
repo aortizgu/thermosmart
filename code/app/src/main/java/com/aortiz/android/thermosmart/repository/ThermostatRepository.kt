@@ -78,15 +78,6 @@ class ThermostatRepository(
         }
     }
 
-//    fun getThermostat(thermostatId: String, cb: (result: OperationResult<DBThermostat>) -> Unit) {
-//        return rtdb.getThermostat(thermostatId, cb)
-//    }
-
-//    fun setThermostatConfig(thermostat: Thermostat, cb: (result: OperationResult<String>) -> Unit) {
-//        val dbObject = thermostat.asDBThermostat()
-//        rtdb.setThermostatConfig(dbObject.id, dbObject.configuration, cb)
-//    }
-
     fun followThermostat(id: String, cb: (result: OperationResult<String>) -> Unit) {
         rtdb.followThermostat(id, cb)
     }

@@ -156,7 +156,7 @@ object BindingAdapters {
         val dt = Instant.ofEpochSecond(value.toLong())
             .atZone(ZoneId.systemDefault())
             .toLocalDateTime()
-        textView.text = dt.format(DateTimeFormatter.ofPattern(" KK:mm a EEE LLL"))
+        textView.text = dt.format(DateTimeFormatter.ofPattern(" KK:mm a EEE d LLL"))
     }
 
     @BindingAdapter("goneIfNot")

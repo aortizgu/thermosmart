@@ -77,7 +77,7 @@ class Thermostat(
 
     @Parcelize
     class Status(
-        private var esp8266: ESP8266,
+        var esp8266: ESP8266,
         var outputs: Outputs,
         var lastWateringActivation: Int?,
         var nextWateringActivation: Int?,
@@ -95,11 +95,11 @@ class Thermostat(
 
         @Parcelize
         class ESP8266(
-            private var boilerState: Boolean?,
-            private var wateringState: Boolean?,
-            private var heartbeat: Int?,
-            private var num: Int?,
-            private var period: Int?,
+            var boilerState: Boolean?,
+            var wateringState: Boolean?,
+            var heartbeat: Int?,
+            var num: Int?,
+            var period: Int?,
         ) : Parcelable {
             fun asDBESP8266(): DBESP8266 {
                 return DBESP8266(
