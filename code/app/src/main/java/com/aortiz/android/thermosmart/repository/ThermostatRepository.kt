@@ -138,15 +138,27 @@ class ThermostatRepository(
         rtdb.setControllerWateringAutomaticActivation(id, checked, cb)
     }
 
-    fun setControllerBoilerThreshold(id: String, threshold: Double, cb: (result: OperationResult<String>) -> Unit) {
+    fun setControllerBoilerThreshold(
+        id: String,
+        threshold: Double,
+        cb: (result: OperationResult<String>) -> Unit
+    ) {
         rtdb.setControllerBoilerThreshold(id, threshold, cb)
     }
 
-    fun setControllerWateringConfig(id: String, wateringConfig: Thermostat.Configuration.Watering, cb: (result: OperationResult<String>) -> Unit) {
+    fun setControllerWateringConfig(
+        id: String,
+        wateringConfig: Thermostat.Configuration.Watering,
+        cb: (result: OperationResult<String>) -> Unit
+    ) {
         rtdb.setControllerWateringConfig(id, wateringConfig.asDBWateringConfiguration(), cb)
     }
 
-    fun setControllerLastWateringActivation(id: String, epochSecond: Long, cb: (result: OperationResult<String>) -> Unit) {
+    fun setControllerLastWateringActivation(
+        id: String,
+        epochSecond: Long,
+        cb: (result: OperationResult<String>) -> Unit
+    ) {
         rtdb.setControllerLastWateringActivation(id, epochSecond, cb)
     }
 

@@ -5,7 +5,6 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.app.TaskStackBuilder
 import android.content.Context
-import android.content.Intent
 import android.graphics.BitmapFactory
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -15,8 +14,18 @@ import timber.log.Timber
 
 private const val NOTIFICATION_CHANNEL_ID =
     "com.google.firebase.messaging.default_notification_channel_id_0"
+const val STATE_TRUE = "true"
+const val STATE_FALSE = "false"
+const val SYSTEM_WATERING = "watering"
+const val SYSTEM_BOILER = "boiler"
 
-fun sendNotification(context: Context, title: String, body: String, thermostatId: String) {
+fun sendNotification(
+    context: Context,
+    title: String,
+    body: String,
+    thermostatId: String,
+    system: String
+) {
     Timber.i("sendNotification")
     val notificationManager = context
         .getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -33,28 +42,23 @@ fun sendNotification(context: Context, title: String, body: String, thermostatId
         notificationManager.createNotificationChannel(channel)
     }
 
-//    val intent =
-//        NotificationActivity.newIntent(context.applicationContext, thermostatId)
-//    val stackBuilder = TaskStackBuilder.create(context)
-////        .addParentStack(NotificationActivity::class.java)
-//        .addNextIntentWithParentStack(intent)
-//    val notificationPendingIntent = stackBuilder.getPendingIntent(intId, FLAG_IMMUTABLE)
-
     val intent =
         NotificationActivity.newIntent(context.applicationContext, thermostatId)
     val notificationPendingIntent: PendingIntent? = TaskStackBuilder.create(context).run {
         // Add the intent, which inflates the back stack
         addNextIntentWithParentStack(intent)
         // Get the PendingIntent containing the entire back stack
-        getPendingIntent(0,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE)
+        getPendingIntent(
+            0,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_MUTABLE
+        )
     }
     val builder = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID)
-        .setSmallIcon(R.drawable.ic_stat_name)
+        .setSmallIcon(if (system == SYSTEM_BOILER) R.drawable.ic_stat_name else R.drawable.ic_stat_water)
         .setLargeIcon(
             BitmapFactory.decodeResource(
                 context.resources,
-                R.drawable.ic_heater
+                if (system == SYSTEM_BOILER) R.drawable.ic_heater else R.drawable.ic_water_hose
             )
         )
         .setContentTitle(title)

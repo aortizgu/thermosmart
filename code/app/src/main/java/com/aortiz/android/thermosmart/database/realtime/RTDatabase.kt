@@ -18,7 +18,7 @@ class RTDatabase(context: Context) {
 
     private var database: FirebaseDatabase =
         Firebase.database(context.getString(R.string.db_url))
-        //Firebase.database(context.getString(R.string.emulator_db_url))
+    //Firebase.database(context.getString(R.string.emulator_db_url))
 
     companion object {
         const val ROOT_REFERENCE = "root"
@@ -310,7 +310,11 @@ class RTDatabase(context: Context) {
         }
     }
 
-    fun setControllerBoilerAutomaticActivation(id: String, checked: Boolean, cb: (result: OperationResult<String>) -> Unit) {
+    fun setControllerBoilerAutomaticActivation(
+        id: String,
+        checked: Boolean,
+        cb: (result: OperationResult<String>) -> Unit
+    ) {
         val userId = Firebase.auth.currentUser?.uid
         if (userId != null) {
             Timber.d("setControllerBoilerAutomaticActivation: new state $checked, for id $id")
@@ -330,7 +334,11 @@ class RTDatabase(context: Context) {
         }
     }
 
-    fun setControllerWateringAutomaticActivation(id: String, checked: Boolean, cb: (result: OperationResult<String>) -> Unit) {
+    fun setControllerWateringAutomaticActivation(
+        id: String,
+        checked: Boolean,
+        cb: (result: OperationResult<String>) -> Unit
+    ) {
         val userId = Firebase.auth.currentUser?.uid
         if (userId != null) {
             Timber.d("setControllerWateringAutomaticActivation: new state $checked, for id $id")
@@ -350,7 +358,11 @@ class RTDatabase(context: Context) {
         }
     }
 
-    fun setControllerBoilerThreshold(id: String, threshold: Double, cb: (result: OperationResult<String>) -> Unit) {
+    fun setControllerBoilerThreshold(
+        id: String,
+        threshold: Double,
+        cb: (result: OperationResult<String>) -> Unit
+    ) {
         val userId = Firebase.auth.currentUser?.uid
         if (userId != null) {
             Timber.d("setControllerBoilerThreshold: new threshold $threshold, for id $id")
@@ -370,7 +382,11 @@ class RTDatabase(context: Context) {
         }
     }
 
-    fun setControllerWateringConfig(id: String, wateringConfig: DBWateringConfiguration, cb: (result: OperationResult<String>) -> Unit) {
+    fun setControllerWateringConfig(
+        id: String,
+        wateringConfig: DBWateringConfiguration,
+        cb: (result: OperationResult<String>) -> Unit
+    ) {
         val userId = Firebase.auth.currentUser?.uid
         if (userId != null) {
             Timber.d("setControllerWateringConfig: new wateringConfig $wateringConfig, for id $id")
@@ -393,7 +409,11 @@ class RTDatabase(context: Context) {
         }
     }
 
-    fun setControllerLastWateringActivation(id: String, epochSecond: Long, cb: (result: OperationResult<String>) -> Unit) {
+    fun setControllerLastWateringActivation(
+        id: String,
+        epochSecond: Long,
+        cb: (result: OperationResult<String>) -> Unit
+    ) {
         val userId = Firebase.auth.currentUser?.uid
         if (userId != null) {
             Timber.d("setControllerLastWateringActivation: new lastWateringActivation $epochSecond, for id $id")

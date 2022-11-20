@@ -145,7 +145,10 @@ class ThermostatDetailViewModel(
     fun startWatering() {
         Timber.d("startWatering")
         if (updateState.value == UpdateState.IDLE) {
-            repository.setControllerLastWateringActivation(thermostatId, Instant.now().epochSecond) { result ->
+            repository.setControllerLastWateringActivation(
+                thermostatId,
+                Instant.now().epochSecond
+            ) { result ->
                 when (result) {
                     is OperationResult.Success -> {
                         Timber.d("setControllerBoilerThreshold:reply: success ${result.data}")

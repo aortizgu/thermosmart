@@ -44,29 +44,29 @@ class ThermosmartFirebaseMessagingService : FirebaseMessagingService() {
                 Timber.e("invalid parameters, cannot be empty")
                 return
             }
-            if (state != "true" && state != "false") {
+            if (state != STATE_TRUE && state != STATE_FALSE) {
                 Timber.e("invalid state parameter $state")
                 return
             }
-            if (system != "watering" && system != "boiler") {
+            if (system != SYSTEM_WATERING && system != SYSTEM_BOILER) {
                 Timber.e("invalid system parameter $system")
                 return
             }
             val systemString =
-                if (system == "watering") getString(R.string.watering_system) else getString(R.string.boiler_system)
-            val stateString = if (system == "watering") {
-                if (state == "true") getString(R.string.system_on_m) else getString(R.string.system_off_m)
+                if (system == SYSTEM_WATERING) getString(R.string.watering_system) else getString(R.string.boiler_system)
+            val stateString = if (system == SYSTEM_WATERING) {
+                if (state == STATE_TRUE) getString(R.string.system_on_m) else getString(R.string.system_off_m)
             } else {
-                if (state == "true") getString(R.string.system_on_f) else getString(R.string.system_off_f)
+                if (state == STATE_TRUE) getString(R.string.system_on_f) else getString(R.string.system_off_f)
             }
             val title = getString(R.string.notification_title, systemString, stateString)
-            val body = if (system == "watering") {
-                if (state == "true") getString(
+            val body = if (system == SYSTEM_WATERING) {
+                if (state == STATE_TRUE) getString(
                     R.string.notification_body_watering_active,
                     name
                 ) else getString(R.string.notification_body_watering_inactive, name)
             } else {
-                if (state == "true") getString(
+                if (state == STATE_TRUE) getString(
                     R.string.notification_body_boiler_active,
                     name
                 ) else getString(R.string.notification_body_boiler_inactive, name)
@@ -75,7 +75,8 @@ class ThermosmartFirebaseMessagingService : FirebaseMessagingService() {
                 applicationContext,
                 title,
                 body,
-                id
+                id,
+                system
             )
         } else {
             Timber.e("missing keys received")

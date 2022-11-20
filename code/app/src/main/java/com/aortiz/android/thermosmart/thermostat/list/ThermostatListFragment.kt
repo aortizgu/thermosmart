@@ -49,7 +49,12 @@ class ThermostatListFragment : Fragment() {
                 )
             }) { thermostat ->
                 AlertDialog.Builder(activity)
-                    .setTitle(getString(R.string.delete_fragment_dialog_title, thermostat.configuration.name))
+                    .setTitle(
+                        getString(
+                            R.string.delete_fragment_dialog_title,
+                            thermostat.configuration.name
+                        )
+                    )
                     .setPositiveButton(
                         getString(com.aortiz.android.thermosmart.R.string.option_yes)
                     ) { _, _ -> thermostat.id?.let { viewModel.unfollowThermostat(it) } }
@@ -159,7 +164,7 @@ class ThermostatListFragment : Fragment() {
                         )
                     )
                 }
-            } catch (e: java.lang.Exception){
+            } catch (e: java.lang.Exception) {
                 Timber.e("error $e")
             }
         }

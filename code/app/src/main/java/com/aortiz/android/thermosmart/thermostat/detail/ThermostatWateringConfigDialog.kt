@@ -10,8 +10,6 @@ import androidx.fragment.app.DialogFragment
 import com.aortiz.android.thermosmart.R
 import com.aortiz.android.thermosmart.databinding.ThermostatWateringConfigDialogFragmentBinding
 import com.aortiz.android.thermosmart.domain.Thermostat
-import com.aortiz.android.thermosmart.utils.BindingAdapters
-import timber.log.Timber
 
 
 class ThermostatWateringConfigDialog(
@@ -47,7 +45,7 @@ class ThermostatWateringConfigDialog(
             dismiss()
         }
         wateringConfig.frequencyDay?.let {
-            val index = it -1
+            val index = it - 1
             val valuesSize = resources.getStringArray(R.array.wateringFreq).size
             if (index in 1..valuesSize) binding.wateringFreqSpinner.setSelection(index)
         }
@@ -65,7 +63,7 @@ class ThermostatWateringConfigDialog(
                 }
             }
         wateringConfig.durationMinute?.let {
-            val index = it -1
+            val index = it - 1
             val valuesSize = resources.getStringArray(R.array.wateringDuration).size
             if (index in 1..valuesSize) binding.wateringDurationSpinner.setSelection(index)
         }
