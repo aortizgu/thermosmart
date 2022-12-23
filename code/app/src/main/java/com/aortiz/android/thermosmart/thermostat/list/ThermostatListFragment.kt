@@ -16,10 +16,13 @@ import com.aortiz.android.thermosmart.authentication.AuthenticationActivity
 import com.aortiz.android.thermosmart.databinding.ThermostatListFragmentBinding
 import com.aortiz.android.thermosmart.thermostat.MainActivity
 import com.aortiz.android.thermosmart.utils.ERROR
+import com.aortiz.android.thermosmart.utils.debounce
 import com.aortiz.android.thermosmart.utils.setDisplayHomeAsUpEnabled
 import com.firebase.ui.auth.AuthUI
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import org.koin.androidx.viewmodel.ext.android.viewModel
 import timber.log.Timber
 
@@ -56,10 +59,10 @@ class ThermostatListFragment : Fragment() {
                         )
                     )
                     .setPositiveButton(
-                        getString(com.aortiz.android.thermosmart.R.string.option_yes)
+                        getString(R.string.option_yes)
                     ) { _, _ -> thermostat.id?.let { viewModel.unfollowThermostat(it) } }
                     .setNegativeButton(
-                        getString(com.aortiz.android.thermosmart.R.string.option_no)
+                        getString(R.string.option_no)
                     ) { _, _ -> }
                     .create()
                     .show()
@@ -168,5 +171,7 @@ class ThermostatListFragment : Fragment() {
                 Timber.e("error $e")
             }
         }
+        viewModel.connectedState.debounce(1000L, CoroutineScope(Dispatchers.Main))
+            .observe(viewLifecycleOwner) { viewModel.connectedStateFiltered.value = it }
     }
 }

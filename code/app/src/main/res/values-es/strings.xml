@@ -70,4 +70,12 @@
         <item>15 minutos</item>
     </string-array>
     <string name="watering_config_title_dialog">Configure el regado automaático:</string>
+    <string name="connection_error_message">ERROR DE CONEXIÓN</string>
+    <string name="add_thermostat_cd">Añade nuevo termostato</string>
+    <string name="weather_icon_cd">Icono de meteorología</string>
+    <string name="heater_icon_cd">Icono de estufa</string>
+    <string name="knob_icon_cd">Icono de regulador de temperatura</string>
+    <string name="boiler_state_icon_cd">Icono de estado de calefación</string>
+    <string name="water_hose_icon_cd">Icono de manguera</string>
+    <string name="watering_state_icon_cd">Icono de estado del riego</string>
 </resources>

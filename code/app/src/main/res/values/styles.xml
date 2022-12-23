@@ -6,6 +6,12 @@
         <item name="android:fontFamily">@font/inria_sans</item>
         <item name="android:textStyle">bold</item>
     </style>
+    <style name="error_text_style">
+        <item name="android:textSize">24sp</item>
+        <item name="android:fontFamily">@font/inria_sans</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/md_theme_dark_scrim</item>
+    </style>
     <style name="data_text_style">
         <item name="android:textSize">20sp</item>
         <item name="android:fontFamily">@font/inria_sans</item>
@@ -17,5 +23,7 @@
         <item name="android:fontFamily">@font/inria_sans</item>
         <item name="android:textStyle">bold</item>
     </style>
-
+    <style name="my_error_card_view">
+        <item name="android:background">@color/md_theme_light_error</item>
+    </style>
 </resources>

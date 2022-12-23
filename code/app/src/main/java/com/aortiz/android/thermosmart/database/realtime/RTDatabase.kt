@@ -39,7 +39,7 @@ class RTDatabase(context: Context) {
     }
 
     init {
-        database.setPersistenceEnabled(true)
+        database.setPersistenceEnabled(false)
     }
 
     fun load() {
@@ -58,6 +58,14 @@ class RTDatabase(context: Context) {
         }
     }
 
+    fun getConnectedStateLiveData(): FirebaseDatabaseLiveData<Boolean> {
+        return FirebaseDatabaseLiveData(
+            database.getReference(".info/connected"),
+            Boolean::class.java,
+            false
+        )
+    }
+
     fun getThermostatLiveData(thermostatId: String): FirebaseDatabaseLiveData<DBThermostat> {
         return FirebaseDatabaseLiveData(
             database.getReference("$ROOT_REFERENCE/$DEVICES_REFERENCE/$thermostatId"),
@@ -67,7 +75,7 @@ class RTDatabase(context: Context) {
 
     fun getUserThermostatListLiveData(): LiveData<List<DBThermostat>> {
         return FirebaseDatabaseLiveData(
-            database.getReference("$ROOT_REFERENCE"),
+            database.getReference(ROOT_REFERENCE),
             DBSnapShot::class.java
         ).map { snapShot ->
             val uid = Firebase.auth.currentUser?.uid
@@ -94,53 +102,6 @@ class RTDatabase(context: Context) {
         }
     }
 
-    fun getThermostat(thermostatId: String, cb: (result: OperationResult<DBThermostat>) -> Unit) {
-        database.getReference("$ROOT_REFERENCE/$DEVICES_REFERENCE/$thermostatId").get()
-            .addOnSuccessListener { dataSnapshot ->
-                Timber.d("getThermostat: success")
-                var thermostat = dataSnapshot.getValue(DBThermostat::class.java)
-                if (thermostat != null) {
-                    cb(OperationResult.Success(thermostat))
-                } else {
-                    Timber.e("getThermostat: null thermostat")
-                    cb(
-                        OperationResult.Error(
-                            Exception("null thermostat")
-                        )
-                    )
-                }
-            }.addOnFailureListener {
-                Timber.e("getThermostat: Error getting data $it")
-                cb(
-                    OperationResult.Error(
-                        Exception("Error getting data")
-                    )
-                )
-            }
-    }
-
-    fun setThermostatConfig(
-        id: String?,
-        configuration: DBThermostatConfiguration?,
-        cb: (result: OperationResult<String>) -> Unit
-    ) {
-        database.getReference("$ROOT_REFERENCE/$DEVICES_REFERENCE/$id/$CONFIG_REFERENCE")
-            .setValue(configuration).addOnSuccessListener {
-                Timber.i("setThermostatConfig: data saved")
-                cb(OperationResult.Success("data saved"))
-                return@addOnSuccessListener
-            }.addOnFailureListener {
-                Timber.e("setThermostatConfig: Error saving data $it")
-                cb(
-                    OperationResult.Error(
-                        Exception("Error $it"),
-                        ERROR.UNKNOWN
-                    )
-                )
-                return@addOnFailureListener
-            }
-    }
-
     fun followThermostat(id: String, cb: (result: OperationResult<String>) -> Unit) {
         val userId = Firebase.auth.currentUser?.uid
         if (userId != null) {
@@ -150,7 +111,7 @@ class RTDatabase(context: Context) {
             reference.get()
                 .addOnSuccessListener addOnSuccessListener1@{ dataSnapshot ->
                     if (dataSnapshot.hasChild(id)) {
-                        var devicesList = dataSnapshot.child(id).child(CONFIG_REFERENCE)
+                        val devicesList = dataSnapshot.child(id).child(CONFIG_REFERENCE)
                             .child(FOLLOWERS_REFERENCE).getValue<ArrayList<String>>() ?: ArrayList()
                         if (!devicesList.contains(userId)) {
                             devicesList.add(userId)
@@ -208,7 +169,7 @@ class RTDatabase(context: Context) {
                 database.getReference("$ROOT_REFERENCE/$DEVICES_REFERENCE/$id/$CONFIG_REFERENCE/$FOLLOWERS_REFERENCE")
             reference.get()
                 .addOnSuccessListener addOnSuccessListener1@{ dataSnapshot ->
-                    var devicesList = dataSnapshot.getValue<ArrayList<String>>() ?: ArrayList()
+                    val devicesList = dataSnapshot.getValue<ArrayList<String>>() ?: ArrayList()
                     if (devicesList.contains(userId)) {
                         devicesList.remove(userId)
                         reference

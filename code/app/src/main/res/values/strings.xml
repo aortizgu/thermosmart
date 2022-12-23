@@ -52,6 +52,15 @@
     <string name="last_watering_time">Last:</string>
     <string name="next_watering_time">Next:</string>
     <string name="watering_config_title_dialog">Configure automatic watering:</string>
+    <string name="connection_error_message">CONNECTION ERROR</string>
+    <string name="add_thermostat_cd">Add new thermostat</string>
+    <string name="weather_icon_cd">Weather icon</string>
+    <string name="heater_icon_cd">heater icon</string>
+    <string name="knob_icon_cd">knob icon</string>
+    <string name="boiler_state_icon_cd">Boiler state icon</string>
+    <string name="water_hose_icon_cd">Water hose icon</string>
+    <string name="watering_state_icon_cd">watering state icon</string>
+    <string name="temp_placeholder" translatable="false">%1$s %2$s</string>
     <string-array name="wateringFreq">
         <item>1 day</item>
         <item>2 days</item>

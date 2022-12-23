@@ -36,7 +36,9 @@ class ThermostatListViewModel(app: Application, private val repository: Thermost
     val errorCode: LiveData<ERROR?>
         get() = _errorCode
 
-    var thermostatList: LiveData<List<Thermostat>> = repository.getUserThermostatListLiveData()
+    val thermostatList: LiveData<List<Thermostat>> = repository.getUserThermostatListLiveData()
+    val connectedState: LiveData<Boolean> = repository.getConnectedStateLiveData()
+    val connectedStateFiltered: MutableLiveData<Boolean> =  MutableLiveData(true)
 
     init {
         viewModelScope.launch {

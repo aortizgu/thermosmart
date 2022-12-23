@@ -64,6 +64,10 @@ class ThermostatRepository(
         }
     }
 
+    fun getConnectedStateLiveData(): FirebaseDatabaseLiveData<Boolean> {
+        return rtdb.getConnectedStateLiveData()
+    }
+
     fun getThermostatLiveData(thermostatId: String): FirebaseDatabaseLiveData<DBThermostat> {
         return rtdb.getThermostatLiveData(thermostatId)
     }
