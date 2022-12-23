@@ -8,16 +8,11 @@ class FirebaseDatabaseLiveData<T> private constructor(
     private val reference: DatabaseReference,
     private val type: Class<T>?,
     private val typeIndicator: GenericTypeIndicator<T>?,
+    private val sync: Boolean = true
 ) : LiveData<T>() {
-    constructor(reference: DatabaseReference, type: Class<T>) : this(reference, type, null) {
+    constructor(reference: DatabaseReference, type: Class<T>, sync: Boolean = true) : this(reference, type, null, sync) {
         Timber.d("reference $reference")
     }
-
-    constructor(reference: DatabaseReference, type: GenericTypeIndicator<T>) : this(
-        reference,
-        null,
-        type
-    )
 
     private val listener = object : ValueEventListener {
         override fun onDataChange(snapshot: DataSnapshot) {
@@ -39,14 +34,14 @@ class FirebaseDatabaseLiveData<T> private constructor(
     override fun onActive() {
         super.onActive()
         Timber.d("onActive $reference")
-        reference.keepSynced(true)
+        if (sync) reference.keepSynced(true)
         reference.addValueEventListener(listener)
     }
 
     override fun onInactive() {
         super.onInactive()
         Timber.d("onInactive $reference")
-        reference.keepSynced(false)
+        if (sync) reference.keepSynced(false)
         reference.removeEventListener(listener)
     }
 }

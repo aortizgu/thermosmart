@@ -73,7 +73,7 @@ object BindingAdapters {
         val farEnabled = ThermostatRepositoryInstance.repository.getShowInFahrenheitConfig()
         val units = if (farEnabled) "ºF" else "ºC"
         val value = if (farEnabled) celsiusValue + 32 else celsiusValue
-        textView.text = "${value.format(2)} $units"
+        textView.text = ThermostatRepositoryInstance.context.resources.getString(R.string.temp_placeholder, value.format(2), units)
     }
 
     private fun Double.format(digits: Int) = "%.${digits}f".format(this)
@@ -88,6 +88,12 @@ object BindingAdapters {
     @JvmStatic
     fun goneIfNull(view: View, it: Any?) {
         view.visibility = if (it == null) View.GONE else View.VISIBLE
+    }
+
+    @BindingAdapter("goneIfTrue")
+    @JvmStatic
+    fun goneIfTrue(view: View, it: Boolean) {
+        view.visibility = if (it) View.GONE else View.VISIBLE
     }
 
     @BindingAdapter("thermostatStatusImage")

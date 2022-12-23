@@ -15,6 +15,37 @@
         android:layout_height="match_parent">
 
         <androidx.cardview.widget.CardView
+            android:id="@+id/connectionStateCardView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/padding_medium"
+            app:goneIfTrue="@{viewModel.connectedStateFiltered}"
+            app:layout_constraintBottom_toTopOf="@+id/deviceNameCardView"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                style="@style/my_error_card_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:id="@+id/name"
+                    style="@style/error_text_style"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/connection_error_message"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    tools:text="Connection Error" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
             android:id="@+id/deviceNameCardView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -23,8 +54,8 @@
             android:layout_marginEnd="@dimen/margin_normal"
             app:cardCornerRadius="@dimen/big_radius"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintStart_toEndOf="@id/connectionStateCardView"
+            app:layout_constraintTop_toBottomOf="@id/connectionStateCardView">
 
             <androidx.constraintlayout.widget.ConstraintLayout
                 style="@style/my_card_view"
@@ -105,6 +136,7 @@
                     android:layout_marginStart="8dp"
                     android:layout_marginTop="8dp"
                     android:layout_marginBottom="8dp"
+                    android:contentDescription="@string/weather_icon_cd"
                     app:imageUrl="@{viewModel.exteriorImage}"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
@@ -163,6 +195,7 @@
                     android:layout_height="39dp"
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="8dp"
+                    android:contentDescription="@string/heater_icon_cd"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:srcCompat="@drawable/ic_heater" />
@@ -179,7 +212,7 @@
                     app:tempText="@{viewModel.thermostat.status.temperature}"
                     tools:text="20.5 ºC" />
 
-                <Switch
+                <com.google.android.material.switchmaterial.SwitchMaterial
                     android:id="@+id/switchBoilerAutomaticActivation"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -197,6 +230,7 @@
                     android:layout_marginStart="@dimen/margin_normal"
                     android:layout_marginTop="32dp"
                     android:layout_marginBottom="8dp"
+                    android:contentDescription="@string/knob_icon_cd"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/imageViewTopLeftIcon"
@@ -220,6 +254,7 @@
                     android:layout_height="47dp"
                     android:layout_marginEnd="8dp"
                     android:layout_marginBottom="8dp"
+                    android:contentDescription="@string/boiler_state_icon_cd"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:thermostatStatusImage="@{viewModel.thermostat}"
@@ -254,11 +289,12 @@
                     android:layout_height="39dp"
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="8dp"
+                    android:contentDescription="@string/water_hose_icon_cd"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:srcCompat="@drawable/ic_water_hose" />
 
-                <Switch
+                <com.google.android.material.switchmaterial.SwitchMaterial
                     android:id="@+id/switchWateringAutomaticActivation"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -275,6 +311,7 @@
                     android:layout_height="47dp"
                     android:layout_marginEnd="8dp"
                     android:layout_marginBottom="8dp"
+                    android:contentDescription="@string/watering_state_icon_cd"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:wateringStatusImage="@{viewModel.thermostat}"

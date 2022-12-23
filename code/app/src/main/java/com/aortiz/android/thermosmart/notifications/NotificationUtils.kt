@@ -30,7 +30,6 @@ fun sendNotification(
     val notificationManager = context
         .getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-    val intId = polynomialRollingHash(thermostatId)
     if (notificationManager.getNotificationChannel(NOTIFICATION_CHANNEL_ID) == null
     ) {
         val name = context.getString(R.string.app_name)
@@ -66,6 +65,7 @@ fun sendNotification(
         .setContentIntent(notificationPendingIntent)
         .setAutoCancel(true)
 
+    val intId = polynomialRollingHash(thermostatId+system)
     with(NotificationManagerCompat.from(context)) {
         notify(intId, builder.build())
     }

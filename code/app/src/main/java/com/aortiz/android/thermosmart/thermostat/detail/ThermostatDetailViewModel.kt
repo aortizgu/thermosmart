@@ -23,6 +23,8 @@ class ThermostatDetailViewModel(
     val thermostat: LiveData<Thermostat> = repository.getThermostatLiveData(thermostatId).map {
         it.asDomainModel()
     }
+    val connectedState: LiveData<Boolean> = repository.getConnectedStateLiveData()
+    val connectedStateFiltered: MutableLiveData<Boolean> =  MutableLiveData(true)
 
     private val _updateState = MutableLiveData(UpdateState.IDLE)
     val updateState: LiveData<UpdateState>

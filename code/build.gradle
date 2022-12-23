@@ -8,8 +8,7 @@ buildscript {
 
     repositories {
         google()
-        jcenter()
-
+        mavenCentral()
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:7.3.1'
@@ -35,12 +34,12 @@ ext {
     coroutinesVersion = '1.6.4'
     roomVersion = '2.4.3'
     koinVersion = '3.2.2'
-    playServicesLocationVersion = '21.0.0'
+    playServicesLocationVersion = '21.0.1'
     playServicesMapsVersion = '18.1.0'
     firebaseUIVersion = '7.2.0'
     firebaseRTDBVersion = '20.1.0'
     firebaseAuthVersion = '21.1.0'
-    firebaseMessagingVersion = '23.1.0'
+    firebaseMessagingVersion = '23.1.1'
     firebaseAnalyticsVersion = '21.2.0'
     multidexVersion = '2.0.1'
     timberVersion = '5.0.1'

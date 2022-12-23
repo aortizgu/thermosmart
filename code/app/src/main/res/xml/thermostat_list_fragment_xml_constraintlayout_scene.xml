@@ -15,11 +15,17 @@
         <Constraint
             motion:layout_constraintEnd_toEndOf="parent"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
             motion:layout_constraintBottom_toBottomOf="parent"
+            motion:layout_constraintStart_toStartOf="@id/connectionStateCardView"
+            android:id="@+id/thermostatRecyclerView" />
+        <Constraint android:id="@+id/connectionStateCardView"
+            motion:layout_constraintTop_toTopOf="parent"
+            android:layout_height="wrap_content"
+            motion:layout_constraintEnd_toStartOf="@id/thermostatRecyclerView"
             motion:layout_constraintStart_toStartOf="parent"
-            android:id="@+id/thermostatRecyclerView"
-            motion:layout_constraintTop_toTopOf="parent" />
+            motion:layout_constraintBottom_toTopOf="@+id/thermostatRecyclerView"
+            android:layout_width="match_parent" />
     </ConstraintSet>
 
     <ConstraintSet android:id="@+id/end">

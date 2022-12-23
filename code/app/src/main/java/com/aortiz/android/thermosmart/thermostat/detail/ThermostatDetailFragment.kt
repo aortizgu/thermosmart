@@ -12,7 +12,10 @@ import androidx.navigation.fragment.findNavController
 import com.aortiz.android.thermosmart.R
 import com.aortiz.android.thermosmart.databinding.ThermostatDetailFragmentBinding
 import com.aortiz.android.thermosmart.utils.ERROR
+import com.aortiz.android.thermosmart.utils.debounce
 import com.aortiz.android.thermosmart.utils.setDisplayHomeAsUpEnabled
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import org.koin.android.ext.android.inject
 import org.koin.core.parameter.parametersOf
 import timber.log.Timber
@@ -27,7 +30,7 @@ class ThermostatDetailFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         Timber.i("onCreateView")
         val args = ThermostatDetailFragmentArgs.fromBundle(requireArguments())
         setDisplayHomeAsUpEnabled(args.navHost)
@@ -44,6 +47,8 @@ class ThermostatDetailFragment : Fragment() {
                 viewModel.loadWeatherData(location.latitude!!, location.longitude!!)
             }
         }
+        viewModel.connectedState.debounce(1000L, CoroutineScope(Dispatchers.Main))
+            .observe(viewLifecycleOwner) { viewModel.connectedStateFiltered.value = it }
         return binding.root
     }
 

@@ -3,7 +3,6 @@ package com.aortiz.android.thermosmart.thermostat.detail
 import android.app.AlertDialog
 import android.app.Dialog
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
 import android.widget.SeekBar
 import androidx.fragment.app.DialogFragment
@@ -22,13 +21,12 @@ class ThermostatChangeThresholdDialog(
     private val binding get() = _binding!!
 
     companion object {
-        const val MAX_THRESHOLD = 30.0
+        const val MAX_THRESHOLD = 25.0
         const val MIN_THRESHOLD = 15.0
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        _binding =
-            ThermostatChangeThresholdDialogFragmentBinding.inflate(LayoutInflater.from(context))
+        _binding = ThermostatChangeThresholdDialogFragmentBinding.inflate(layoutInflater)
         return AlertDialog.Builder(requireActivity())
             .setTitle(R.string.thermostat_change_threshold_dialog_fragment)
             .setView(binding.root)
