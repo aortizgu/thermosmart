@@ -9,36 +9,41 @@ def localProperties = new Properties()
 localProperties.load(new FileInputStream(rootProject.file("local.properties")))
 
 android {
-    compileSdkVersion rootProject.compileSdkVersion
+    compileSdk rootProject.compileSdkVersion
 
     defaultConfig {
         applicationId "com.aortiz.android.thermosmart"
         minSdkVersion rootProject.minSdkVersion
         targetSdkVersion rootProject.targetSdkVersion
         versionCode 3
-        versionName "3.2"
+        versionName "3.3"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
         buildConfigField "String", "OPEN_WEATHER_API_KEY",localProperties['OPEN_WEATHER_API_KEY']
         resValue "string", "google_maps_key", localProperties['GOOGLE_MAPS_KEY']
     }
+
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+
     kotlinOptions {
-        jvmTarget = "1.8"
+        jvmTarget = "17"
     }
-    testOptions.unitTests {
-        includeAndroidResources = true
-        returnDefaultValues = true
-    }
+
     buildFeatures {
         dataBinding true
         viewBinding true
     }
+
     namespace 'com.aortiz.android.thermosmart'
 }
 
@@ -46,7 +51,7 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
     // Material
-    implementation 'com.google.android.material:material:1.7.0'
+    implementation "com.google.android.material:material:$materialVersion"
 
     // ViewModel
     implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion"
@@ -62,23 +67,8 @@ dependencies {
     implementation "androidx.navigation:navigation-fragment-ktx:$navigationVersion"
     implementation "androidx.navigation:navigation-ui-ktx:$navigationVersion"
 
-    // Worker
-    implementation "androidx.work:work-runtime-ktx:$workRuntimeKtxVersion"
-
-    // Room dependencies
-    implementation "androidx.room:room-ktx:$roomVersion"
-    implementation "androidx.room:room-runtime:$roomVersion"
-    kapt "androidx.room:room-compiler:$roomVersion"
-
-    // Coroutines Dependencies
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutinesVersion"
-
     // Koin
     implementation "io.insert-koin:koin-android:$koinVersion"
-    // Java Compatibility
-    implementation "io.insert-koin:koin-android-compat:$koinVersion"
-    // Jetpack WorkManager
-    implementation "io.insert-koin:koin-androidx-workmanager:$koinVersion"
     // Navigation Graph
     implementation "io.insert-koin:koin-androidx-navigation:$koinVersion"
 

@@ -69,6 +69,10 @@ class ThermostatDetailViewModel(
 
     fun setControllerBoilerAutomaticActivation(checked: Boolean) {
         Timber.d("setControllerBoilerAutomaticActivation $checked")
+        if (thermostat.value?.configuration?.boiler?.automaticActivationEnabled == checked) {
+            Timber.d("setControllerBoilerAutomaticActivation already in that state")
+            return
+        }
         if (updateState.value == UpdateState.IDLE) {
             repository.setControllerBoilerAutomaticActivation(thermostatId, checked) { result ->
                 when (result) {
@@ -88,6 +92,10 @@ class ThermostatDetailViewModel(
 
     fun setControllerWateringAutomaticActivation(checked: Boolean) {
         Timber.d("setControllerWateringAutomaticActivation $checked")
+        if (thermostat.value?.configuration?.watering?.automaticActivationEnabled == checked) {
+            Timber.d("setControllerWateringAutomaticActivation already in that state")
+            return
+        }
         if (updateState.value == UpdateState.IDLE) {
             repository.setControllerWateringAutomaticActivation(thermostatId, checked) { result ->
                 when (result) {
