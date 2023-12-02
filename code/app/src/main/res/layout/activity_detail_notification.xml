@@ -95,7 +95,7 @@
                     android:layout_marginStart="@dimen/margin_small"
                     app:layout_constraintBaseline_toBaselineOf="@+id/thermostatThresholdTextView"
                     app:layout_constraintStart_toEndOf="@+id/thermostatThresholdTextView"
-                    app:tempText="@{viewModel.thermostat.configuration.boiler.threshold}"
+                    app:tempText="@{viewModel.thermostat.configuration.heating.threshold}"
                     tools:text="22.5 ºC" />
 
                 <TextView

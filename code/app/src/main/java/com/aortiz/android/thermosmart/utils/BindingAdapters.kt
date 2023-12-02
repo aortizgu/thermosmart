@@ -99,7 +99,7 @@ object BindingAdapters {
     @BindingAdapter("thermostatStatusImage")
     @JvmStatic
     fun thermostatStatusImage(imageView: ImageView, thermostat: LiveData<Thermostat>) {
-        thermostat.value?.configuration?.boiler?.automaticActivationEnabled?.let { automatic ->
+        thermostat.value?.configuration?.heating?.automaticActivationEnabled?.let { automatic ->
             thermostat.value?.status?.outputs?.boiler?.let { active ->
                 if (!automatic) {
                     imageView.setImageResource(R.drawable.ic_power_disabled)

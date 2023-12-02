@@ -53,7 +53,7 @@ class ThermosmartFirebaseMessagingService : FirebaseMessagingService() {
                 return
             }
             val systemString =
-                if (system == SYSTEM_WATERING) getString(R.string.watering_system) else getString(R.string.boiler_system)
+                if (system == SYSTEM_WATERING) getString(R.string.watering_system) else getString(R.string.heating_system)
             val stateString = if (system == SYSTEM_WATERING) {
                 if (state == STATE_TRUE) getString(R.string.system_on_m) else getString(R.string.system_off_m)
             } else {
@@ -67,9 +67,9 @@ class ThermosmartFirebaseMessagingService : FirebaseMessagingService() {
                 ) else getString(R.string.notification_body_watering_inactive, name)
             } else {
                 if (state == STATE_TRUE) getString(
-                    R.string.notification_body_boiler_active,
+                    R.string.notification_body_heating_active,
                     name
-                ) else getString(R.string.notification_body_boiler_inactive, name)
+                ) else getString(R.string.notification_body_heating_inactive, name)
             }
             sendNotification(
                 applicationContext,

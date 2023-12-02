@@ -83,23 +83,17 @@ class ThermostatDetailFragment : Fragment() {
                 )
             }
         }
-        binding.switchBoilerAutomaticActivation.setOnCheckedChangeListener { _, checked ->
-            viewModel.setControllerBoilerAutomaticActivation(checked)
-        }
-        binding.switchWateringAutomaticActivation.setOnCheckedChangeListener { _, checked ->
-            viewModel.setControllerWateringAutomaticActivation(checked)
-        }
-        binding.thermostatThresholdImageView.setOnClickListener {
-            viewModel.thermostat.value?.configuration?.boiler?.threshold?.let { threshold ->
-                ThermostatChangeThresholdDialog(threshold) { thresholdOut ->
-                    viewModel.setControllerBoilerThreshold(thresholdOut)
+        binding.heatingConfig.setOnClickListener { _ ->
+            viewModel.thermostat.value?.configuration?.heating?.let { it ->
+                ThermostatHeatingConfigDialog(it) {
+                    viewModel.setControllerHeatingConfig(it)
                 }.show(
                     childFragmentManager,
                     ThermostatDetailFragment::class.toString()
                 )
             }
         }
-        binding.wateringSettingsConstraintLayout.setOnClickListener { _ ->
+        binding.wateringConfig.setOnClickListener { _ ->
             viewModel.thermostat.value?.configuration?.watering?.let { it ->
                 ThermostatWateringConfigDialog(it) {
                     viewModel.setControllerWateringConfig(it)

@@ -57,7 +57,7 @@ fun sendNotification(
         .setLargeIcon(
             BitmapFactory.decodeResource(
                 context.resources,
-                if (system == SYSTEM_BOILER) R.drawable.ic_heater else R.drawable.ic_water_hose
+                if (system == SYSTEM_BOILER) R.drawable.ic_heating else R.drawable.ic_water_hose
             )
         )
         .setContentTitle(title)

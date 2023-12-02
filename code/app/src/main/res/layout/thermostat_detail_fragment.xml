@@ -195,10 +195,10 @@
                     android:layout_height="39dp"
                     android:layout_marginStart="16dp"
                     android:layout_marginTop="8dp"
-                    android:contentDescription="@string/heater_icon_cd"
+                    android:contentDescription="@string/heating_icon_cd"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:srcCompat="@drawable/ic_heater" />
+                    app:srcCompat="@drawable/ic_heating" />
 
                 <TextView
                     android:id="@+id/thermostatTempValueTextView"
@@ -212,14 +212,13 @@
                     app:tempText="@{viewModel.thermostat.status.temperature}"
                     tools:text="20.5 ºC" />
 
-                <com.google.android.material.switchmaterial.SwitchMaterial
-                    android:id="@+id/switchBoilerAutomaticActivation"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                <ImageView
+                    android:id="@+id/heatingConfig"
+                    android:layout_width="58dp"
+                    android:layout_height="47dp"
                     android:layout_marginTop="8dp"
                     android:layout_marginEnd="8dp"
-                    android:checked="@{viewModel.thermostat.configuration.boiler.automaticActivationEnabled}"
-                    android:soundEffectsEnabled="false"
+                    app:srcCompat="@drawable/ic_settings"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
@@ -245,7 +244,7 @@
                     android:layout_marginBottom="16dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/thermostatThresholdImageView"
-                    app:tempText="@{viewModel.thermostat.configuration.boiler.threshold}"
+                    app:tempText="@{viewModel.thermostat.configuration.heating.threshold}"
                     tools:text="22.5 ºC" />
 
                 <ImageView
@@ -259,7 +258,6 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:thermostatStatusImage="@{viewModel.thermostat}"
                     tools:src="@drawable/ic_power_off" />
-
 
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.cardview.widget.CardView>
@@ -294,14 +292,24 @@
                     app:layout_constraintTop_toTopOf="parent"
                     app:srcCompat="@drawable/ic_water_hose" />
 
-                <com.google.android.material.switchmaterial.SwitchMaterial
-                    android:id="@+id/switchWateringAutomaticActivation"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+<!--                <com.google.android.material.switchmaterial.SwitchMaterial-->
+<!--                    android:id="@+id/switchWateringAutomaticActivation"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_marginTop="8dp"-->
+<!--                    android:layout_marginEnd="8dp"-->
+<!--                    android:checked="@{viewModel.thermostat.configuration.watering.automaticActivationEnabled}"-->
+<!--                    android:soundEffectsEnabled="false"-->
+<!--                    app:layout_constraintEnd_toEndOf="parent"-->
+<!--                    app:layout_constraintTop_toTopOf="parent" />-->
+
+                <ImageView
+                    android:id="@+id/wateringConfig"
+                    android:layout_width="58dp"
+                    android:layout_height="47dp"
                     android:layout_marginTop="8dp"
                     android:layout_marginEnd="8dp"
-                    android:checked="@{viewModel.thermostat.configuration.watering.automaticActivationEnabled}"
-                    android:soundEffectsEnabled="false"
+                    app:srcCompat="@drawable/ic_settings"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 

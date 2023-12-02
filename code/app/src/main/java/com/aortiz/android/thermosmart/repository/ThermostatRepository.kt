@@ -126,28 +126,11 @@ class ThermostatRepository(
         rtdb.setControllerLocation(id, DBLocationConfiguration(latitude, longitude, location), cb)
     }
 
-    fun setControllerBoilerAutomaticActivation(
+    fun setControllerHeatingConfig(
         id: String,
-        checked: Boolean,
-        cb: (result: OperationResult<String>) -> Unit
-    ) {
-        rtdb.setControllerBoilerAutomaticActivation(id, checked, cb)
-    }
-
-    fun setControllerWateringAutomaticActivation(
-        id: String,
-        checked: Boolean,
-        cb: (result: OperationResult<String>) -> Unit
-    ) {
-        rtdb.setControllerWateringAutomaticActivation(id, checked, cb)
-    }
-
-    fun setControllerBoilerThreshold(
-        id: String,
-        threshold: Double,
-        cb: (result: OperationResult<String>) -> Unit
-    ) {
-        rtdb.setControllerBoilerThreshold(id, threshold, cb)
+        heatingConfig: Thermostat.Configuration.Heating,
+        cb: (result: OperationResult<String>) -> Unit) {
+        rtdb.setControllerHeatingConfig(id, heatingConfig.asDBHeatingConfiguration(), cb)
     }
 
     fun setControllerWateringConfig(

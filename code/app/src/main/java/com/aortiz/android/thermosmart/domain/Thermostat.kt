@@ -13,19 +13,19 @@ class Thermostat(
 
     @Parcelize
     class Configuration(
-        var boiler: Boiler,
+        var heating: Heating,
         var watering: Watering,
         var location: Location,
         var name: String?,
         private var followers: ArrayList<String>?,
     ) : Parcelable {
         @Parcelize
-        class Boiler(
+        class Heating(
             var automaticActivationEnabled: Boolean?,
             var threshold: Double?,
         ) : Parcelable {
-            fun asDBBoilerConfiguration(): DBBoilerConfiguration {
-                return DBBoilerConfiguration(
+            fun asDBHeatingConfiguration(): DBHeatingConfiguration {
+                return DBHeatingConfiguration(
                     automaticActivationEnabled,
                     threshold
                 )
@@ -66,7 +66,7 @@ class Thermostat(
 
         fun asDBConfiguration(): DBThermostatConfiguration {
             return DBThermostatConfiguration(
-                boiler.asDBBoilerConfiguration(),
+                heating.asDBHeatingConfiguration(),
                 watering.asDBWateringConfiguration(),
                 location.asDBLocationConfiguration(),
                 name,

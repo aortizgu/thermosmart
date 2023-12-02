@@ -37,6 +37,10 @@ class ThermostatWateringConfigDialog(
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        binding.switchWateringAutomaticActivation.isChecked = wateringConfig.automaticActivationEnabled == true
+        binding.switchWateringAutomaticActivation.setOnCheckedChangeListener { _, checked ->
+            wateringConfig.automaticActivationEnabled = checked
+        }
         binding.buttonCancel.setOnClickListener {
             dismissNow()
         }

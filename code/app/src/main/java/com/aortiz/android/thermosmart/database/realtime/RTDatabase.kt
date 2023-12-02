@@ -271,74 +271,28 @@ class RTDatabase(context: Context) {
         }
     }
 
-    fun setControllerBoilerAutomaticActivation(
+    fun setControllerHeatingConfig(
         id: String,
-        checked: Boolean,
-        cb: (result: OperationResult<String>) -> Unit
-    ) {
+        heatingConfig: DBHeatingConfiguration,
+        cb: (result: OperationResult<String>) -> Unit) {
         val userId = Firebase.auth.currentUser?.uid
         if (userId != null) {
-            Timber.d("setControllerBoilerAutomaticActivation: new state $checked, for id $id")
-            database.getReference("$ROOT_REFERENCE/$DEVICES_REFERENCE/$id/$CONFIG_REFERENCE/$BOILER_REFERENCE/$AUTOMATIC_ACTIVATION_ENABLED_REFERENCE")
-                .setValue(checked)
-                .addOnSuccessListener {
-                    cb(OperationResult.Success("Updated"))
+            Timber.d("setControllerHeatingConfig: new heatingConfig $heatingConfig, for id $id")
+            database.getReference("$ROOT_REFERENCE/$DEVICES_REFERENCE/$id/$CONFIG_REFERENCE/$BOILER_REFERENCE")
+                .setValue(heatingConfig).addOnSuccessListener {
+                    cb(OperationResult.Success("data saved"))
                     return@addOnSuccessListener
-                }
-                .addOnFailureListener {
-                    cb(OperationResult.Error(Exception("Error $it"), ERROR.UNKNOWN))
+                }.addOnFailureListener {
+                    cb(
+                        OperationResult.Error(
+                            Exception("Error $it"),
+                            ERROR.UNKNOWN
+                        )
+                    )
                     return@addOnFailureListener
                 }
         } else {
-            Timber.d("setControllerBoilerAutomaticActivation: cannot get user")
-            cb(OperationResult.Error(Exception("Error getting user"), ERROR.INVALID_USER))
-        }
-    }
-
-    fun setControllerWateringAutomaticActivation(
-        id: String,
-        checked: Boolean,
-        cb: (result: OperationResult<String>) -> Unit
-    ) {
-        val userId = Firebase.auth.currentUser?.uid
-        if (userId != null) {
-            Timber.d("setControllerWateringAutomaticActivation: new state $checked, for id $id")
-            database.getReference("$ROOT_REFERENCE/$DEVICES_REFERENCE/$id/$CONFIG_REFERENCE/$WATERING_REFERENCE/$AUTOMATIC_ACTIVATION_ENABLED_REFERENCE")
-                .setValue(checked)
-                .addOnSuccessListener {
-                    cb(OperationResult.Success("Updated"))
-                    return@addOnSuccessListener
-                }
-                .addOnFailureListener {
-                    cb(OperationResult.Error(Exception("Error $it"), ERROR.UNKNOWN))
-                    return@addOnFailureListener
-                }
-        } else {
-            Timber.d("setControllerWateringAutomaticActivation: cannot get user")
-            cb(OperationResult.Error(Exception("Error getting user"), ERROR.INVALID_USER))
-        }
-    }
-
-    fun setControllerBoilerThreshold(
-        id: String,
-        threshold: Double,
-        cb: (result: OperationResult<String>) -> Unit
-    ) {
-        val userId = Firebase.auth.currentUser?.uid
-        if (userId != null) {
-            Timber.d("setControllerBoilerThreshold: new threshold $threshold, for id $id")
-            database.getReference("$ROOT_REFERENCE/$DEVICES_REFERENCE/$id/$CONFIG_REFERENCE/$BOILER_REFERENCE/$THRESHOLD_REFERENCE")
-                .setValue(threshold)
-                .addOnSuccessListener {
-                    cb(OperationResult.Success("Updated"))
-                    return@addOnSuccessListener
-                }
-                .addOnFailureListener {
-                    cb(OperationResult.Error(Exception("Error $it"), ERROR.UNKNOWN))
-                    return@addOnFailureListener
-                }
-        } else {
-            Timber.d("setControllerBoilerAutomaticActivation: cannot get user")
+            Timber.d("setControllerHeatingConfig: cannot get user")
             cb(OperationResult.Error(Exception("Error getting user"), ERROR.INVALID_USER))
         }
     }
