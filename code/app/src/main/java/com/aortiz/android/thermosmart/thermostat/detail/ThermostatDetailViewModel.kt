@@ -67,63 +67,17 @@ class ThermostatDetailViewModel(
         }
     }
 
-    fun setControllerBoilerAutomaticActivation(checked: Boolean) {
-        Timber.d("setControllerBoilerAutomaticActivation $checked")
-        if (thermostat.value?.configuration?.boiler?.automaticActivationEnabled == checked) {
-            Timber.d("setControllerBoilerAutomaticActivation already in that state")
-            return
-        }
+    fun setControllerHeatingConfig(heatingConfig: Thermostat.Configuration.Heating) {
+        Timber.d("setControllerHeatingConfig $heatingConfig")
         if (updateState.value == UpdateState.IDLE) {
-            repository.setControllerBoilerAutomaticActivation(thermostatId, checked) { result ->
+            repository.setControllerHeatingConfig(thermostatId, heatingConfig) { result ->
                 when (result) {
                     is OperationResult.Success -> {
-                        Timber.d("setControllerBoilerAutomaticActivation:reply: success ${result.data}")
+                        Timber.d("setControllerHeatingConfig:reply: success ${result.data}")
                         _updateState.value = UpdateState.UPDATED
                     }
                     is OperationResult.Error -> {
-                        Timber.d("setControllerBoilerAutomaticActivation:reply: error ${result.exception}")
-                        _updateState.value = UpdateState.ERROR
-                        _errorCode.value = result.code
-                    }
-                }
-            }
-        }
-    }
-
-    fun setControllerWateringAutomaticActivation(checked: Boolean) {
-        Timber.d("setControllerWateringAutomaticActivation $checked")
-        if (thermostat.value?.configuration?.watering?.automaticActivationEnabled == checked) {
-            Timber.d("setControllerWateringAutomaticActivation already in that state")
-            return
-        }
-        if (updateState.value == UpdateState.IDLE) {
-            repository.setControllerWateringAutomaticActivation(thermostatId, checked) { result ->
-                when (result) {
-                    is OperationResult.Success -> {
-                        Timber.d("setControllerWateringAutomaticActivation:reply: success ${result.data}")
-                        _updateState.value = UpdateState.UPDATED
-                    }
-                    is OperationResult.Error -> {
-                        Timber.d("setControllerWateringAutomaticActivation:reply: error ${result.exception}")
-                        _updateState.value = UpdateState.ERROR
-                        _errorCode.value = result.code
-                    }
-                }
-            }
-        }
-    }
-
-    fun setControllerBoilerThreshold(threshold: Double) {
-        Timber.d("setControllerBoilerThreshold $threshold")
-        if (updateState.value == UpdateState.IDLE) {
-            repository.setControllerBoilerThreshold(thermostatId, threshold) { result ->
-                when (result) {
-                    is OperationResult.Success -> {
-                        Timber.d("setControllerBoilerThreshold:reply: success ${result.data}")
-                        _updateState.value = UpdateState.UPDATED
-                    }
-                    is OperationResult.Error -> {
-                        Timber.d("setControllerBoilerThreshold:reply: error ${result.exception}")
+                        Timber.d("setControllerHeatingConfig:reply: error ${result.exception}")
                         _updateState.value = UpdateState.ERROR
                         _errorCode.value = result.code
                     }

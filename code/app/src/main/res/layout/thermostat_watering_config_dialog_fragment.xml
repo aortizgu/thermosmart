@@ -6,6 +6,28 @@
 
 
     <TextView
+        android:id="@+id/wateringEnabledTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/automatic_activation_enabled"
+        app:layout_constraintEnd_toStartOf="@+id/switchWateringAutomaticActivation"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <com.google.android.material.switchmaterial.SwitchMaterial
+        android:id="@+id/switchWateringAutomaticActivation"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:soundEffectsEnabled="false"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toEndOf="@+id/wateringEnabledTextView"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
         android:id="@+id/freqTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -24,7 +46,7 @@
         android:minWidth="200dp"
         android:spinnerMode="dropdown"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/wateringEnabledTextView"/>
 
     <TextView
         android:id="@+id/durationTextView"

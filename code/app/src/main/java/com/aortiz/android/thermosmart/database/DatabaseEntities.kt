@@ -4,7 +4,7 @@ import com.aortiz.android.thermosmart.domain.Thermostat
 import com.google.firebase.database.IgnoreExtraProperties
 
 @IgnoreExtraProperties
-data class DBBoilerConfiguration(
+data class DBHeatingConfiguration(
     var automaticActivationEnabled: Boolean? = null,
     var threshold: Double? = null,
 )
@@ -26,7 +26,7 @@ data class DBLocationConfiguration(
 
 @IgnoreExtraProperties
 data class DBThermostatConfiguration(
-    var boiler: DBBoilerConfiguration? = null,
+    var boiler: DBHeatingConfiguration? = null,
     var watering: DBWateringConfiguration? = null,
     var location: DBLocationConfiguration? = null,
     var name: String? = null,
@@ -67,7 +67,7 @@ data class DBThermostat(
         return Thermostat(
             id,
             Thermostat.Configuration(
-                Thermostat.Configuration.Boiler(
+                Thermostat.Configuration.Heating(
                     configuration?.boiler?.automaticActivationEnabled,
                     configuration?.boiler?.threshold
                 ),
