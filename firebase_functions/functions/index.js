@@ -24,19 +24,22 @@ async function sendNotification(app, payload, user) {
   }
 
   let tokenError = undefined;
-  await app.messaging().sendToDevice(token, payload)
+  await app.messaging().send({token: token, data: payload.data})
     .then((response) => {
-      response.results.forEach((result, index) => {
-        const error = result.error;
-        if (error) {
-          logger.error("sendNotification: Failure sending notification to", token, error);
-          // Cleanup the tokens who are not registered anymore.
-          if (error.code === "messaging/invalid-registration-token" ||
-            error.code === "messaging/registration-token-not-registered") {
-            tokenError = true;
+      logger.info("send result", response);
+      if (response.results != undefined) {
+        response.results.forEach((result, index) => {
+          const error = result.error;
+          if (error) {
+            logger.error("sendNotification: Failure sending notification to", token, error);
+            // Cleanup the tokens who are not registered anymore.
+            if (error.code === "messaging/invalid-registration-token" ||
+              error.code === "messaging/registration-token-not-registered") {
+              tokenError = true;
+            }
           }
-        }
-      });
+        });
+      }
     }).catch((err) => {
       logger.warn("sendNotification: error when sending notification to ", token, " error ", err);
     });
